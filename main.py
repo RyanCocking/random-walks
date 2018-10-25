@@ -13,13 +13,28 @@ class System:
 
     
 def rotation_matrix_x(angle):
-    pass
+    sin = np.sin(angle)
+    cos = np.cos(angle)
+    
+    return np.array([[1,0,0],
+                     [0,cos,-sin],
+                     [0,sin,cos]])
 
 def rotation_matrix_y(angle):
-    pass
+    sin = np.sin(angle)
+    cos = np.cos(angle)
+    
+    return np.array([[cos,0,sin],
+                     [0,1,0],
+                     [-sin,0,cos]])
     
 def rotation_matrix_z(angle):
-    pass
+    sin = np.sin(angle)
+    cos = np.cos(angle)
+    
+    return np.array([[cos,-sin,0],
+                     [sin,cos,0],
+                     [0,0,1]])
 
     
 class Cell:
@@ -39,21 +54,29 @@ class Cell:
     def run(self):
         """Move forwards in current direction"""
         self.velocity = self.speed * self.direction
-        self.position += self.velocity
+        self.position = self.position + (self.velocity * System.step_size)
     
     def tumble(self, max_angle):
         """Rotate randomly about the x, y and z axes"""
-        pass
+        
+        R_x = rotation_matrix_x(np.random.random()*max_angle)
+        R_y = rotation_matrix_y(np.random.random()*max_angle)
+        R_z = rotation_matrix_z(np.random.random()*max_angle)
+        
+        self.direction = np.matmul(self.direction, R_x)
+        self.direction = np.matmul(self.direction, R_y)
+        self.direction = np.matmul(self.direction, R_z)
+        
     
     def switch_mode(self):
-        """Attempt to switch from run to tumble mode, or vice-versa"""
+        """Attempt to switch from run to tumble mode, and vice-versa"""
         
         random_float = np.random.random()
         if self.run_mode==True:
             if random_float > self.run_chance:
                 self.run_mode = False
                 
-        else:
+        elif self.run_mode==False:
             if random_float > self.tumble_chance:
                 self.run_mode = True
     
@@ -64,7 +87,7 @@ class Cell:
         
         if self.run_mode == True:
             self.run()
-        else:
+        elif self.run_mode == False:
             self.tumble(2*System.pi)
     
     
