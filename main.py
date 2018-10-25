@@ -6,10 +6,12 @@ class System:
     max_time = 100
     step_size = 1
     total_steps = int(max_time / step_size)
-    timesteps = np.linspace(0,max_time,num=total_steps)
+    timesteps = np.linspace(0,max_time,num=total_steps)  # seconds
     
     np.random.seed(100)
     pi = np.pi
+    
+    box_size = 400  # micrometres
 
     
 def rotation_matrix_x(angle):
@@ -105,7 +107,15 @@ for time in System.timesteps:
  
 
 positions = np.array(positions)
+
+# plot x,y
 plt.plot(positions[:,0],positions[:,1])
 plt.xlabel('x ($\mu$m)')
 plt.ylabel('y ($\mu$m)')
-plt.show()
+plt.xlim(-0.5*System.box_size,0.5*System.box_size)
+plt.ylim(-0.5*System.box_size,0.5*System.box_size)
+plt.plot([-0.5*System.box_size,0.5*System.box_size],[0,0],color='k',ls='--',
+         lw=0.5)
+plt.plot([0,0],[-0.5*System.box_size,0.5*System.box_size],color='k',ls='--',
+         lw=0.5)
+plt.savefig('xy_run_tumble.png')
