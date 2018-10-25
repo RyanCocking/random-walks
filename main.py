@@ -6,9 +6,10 @@ class System:
     max_time = 100
     step_size = 1
     total_steps = int(max_time / step_size)
-    timesteps = np.linspace(0,maxtime,num=total_steps)
+    timesteps = np.linspace(0,max_time,num=total_steps)
     
     np.random.seed(100)
+    pi = np.pi
 
     
 def rotation_matrix_x(angle):
@@ -48,15 +49,40 @@ class Cell:
         """Attempt to switch from run to tumble mode, or vice-versa"""
         
         random_float = np.random.random()
-        if run_mode==True:
-            if random_float > run_chance:
-                run_mode = False
+        if self.run_mode==True:
+            if random_float > self.run_chance:
+                self.run_mode = False
                 
-        else if run_mode==False:
-            if random_float > tumble_chance:
-                run_mode = True
+        else:
+            if random_float > self.tumble_chance:
+                self.run_mode = True
     
     def update(self):
         """Attempt to switch movement mode, then execute said mode"""
-        pass
+        
+        self.switch_mode()
+        
+        if self.run_mode == True:
+            self.run()
+        else:
+            self.tumble(2*System.pi)
     
+    
+    
+swimmer = Cell(name='Escherichia coli', position=np.array([0,0,0]), speed=20,
+               direction=np.array([1,0,0]), run_chance=0.3, tumble_chance=0.1,
+               run_mode=True)
+
+positions = []
+
+for time in System.timesteps:
+    
+    swimmer.update()    
+    positions.append(np.copy(swimmer.position))
+ 
+
+positions = np.array(positions)
+plt.plot(positions[:,0],positions[:,1])
+plt.xlabel('x ($\mu$m)')
+plt.ylabel('y ($\mu$m)')
+plt.show()
