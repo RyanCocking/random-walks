@@ -52,13 +52,16 @@ class Cell:
         self.run_chance = run_chance
         self.tumble_chance = tumble_chance
         self.run_mode = run_mode
+
+        self.position_history = []
+        self.mode_history = np.array([],dtype=bool)
     
-    def edge_check(self):
+    def edge_check(self, box_size, step_size):
         """Check if a cell has wandered to the edge of the box. If it has,
         reverse its direction to simulate an elastic collision with the box
         walls."""
 
-        edge = 0.5*System.box_size - (self.speed * System.step_size)
+        edge = 0.5*box_size - (self.speed * step_size)
     
         if abs(self.position[0]) >= edge:
             self.direction[0] = -self.direction[0]
@@ -70,18 +73,18 @@ class Cell:
             self.direction[2] = -self.direction[2]
 
     
-    def run(self):
+    def run(self, step_size):
         """Move forwards in current direction"""
         self.velocity = self.speed * self.direction
-        self.position = self.position + (self.velocity * System.step_size)
+        self.position = self.position + (self.velocity * step_size)
 
 
-    def tumble(self, max_angle):
+    def tumble(self, max_angle, x_matrix, y_matrix, z_matrix):
         """Rotate randomly about the x, y and z axes"""
         
-        R_x = rotation_matrix_x(np.random.random()*max_angle)
-        R_y = rotation_matrix_y(np.random.random()*max_angle)
-        R_z = rotation_matrix_z(np.random.random()*max_angle)
+        R_x = x_matrix(np.random.random()*max_angle)
+        R_y = y_matrix(np.random.random()*max_angle)
+        R_z = z_matrix(np.random.random()*max_angle)
         
         self.direction = np.matmul(self.direction, R_x)
         self.direction = np.matmul(self.direction, R_y)
@@ -96,36 +99,43 @@ class Cell:
             if (random_float > self.run_chance) and (self.tumble_chance > 0):
                 self.run_mode = False
                 
+
         elif self.run_mode==False:
             if (random_float > self.tumble_chance) and (self.run_chance > 0):
                 self.run_mode = True
-    
+               
+
+
     def update(self):
-        """Attempt to switch movement mode, then execute said mode"""
+        """Attempt to switch movement mode then execute said mode. Append data
+        to arrays."""
         
-        self.switch_mode()
-        
+        switch_success = self.switch_mode()
+
         if self.run_mode == True:
-            #self.edge_check()
-            self.run()
+            #self.edge_check(System.box_size, System.step_size)
+            self.run(System.step_size)
         elif self.run_mode == False:
-            self.tumble(2*System.pi)
+            self.tumble(2*System.pi,
+                    rotation_matrix_x, rotation_matrix_y, rotation_matrix_z)
+
+        self.position_history.append(np.copy(self.position))
+        self.mode_history = np.append(self.mode_history,self.run_mode)
     
 
-    
+
+def compute_mode_duration(mode_history, step_size):
+    pass
+
 swimmer = Cell(name='Escherichia coli', position=np.array([0,0,0]), speed=20,
-               direction=np.array([1,1,0]), run_chance=0.3, tumble_chance=0.05,
+               direction=np.array([1,1,0]), run_chance=0.3, tumble_chance=0.1,
                run_mode=True)
 
-positions = []
 
-for time in System.timesteps:
-    
+for time in System.timesteps:   
     swimmer.update()    
-    positions.append(np.copy(swimmer.position))
  
-
-positions = np.array(positions)
+positions = np.array(swimmer.position_history)
 x_pos = positions[:,0]
 y_pos = positions[:,1]
 z_pos = positions[:,2]
@@ -151,6 +161,7 @@ plt.xlabel('t (s)')
 plt.xlim(0,System.max_time)
 plt.savefig('norm_r_vs_t.png')
 plt.close()
+
 # plot x,y,z distributions
 plt.hist(np.unique(x_pos), bins='auto', density=False)
 #plt.plot([0,0],[0,1],lw=0.5,ls='--',color='k')
@@ -164,3 +175,6 @@ plt.hist(np.unique(z_pos), bins='auto', density=False)
 #plt.plot([0,0],[0,1],lw=0.5,ls='--',color='k')
 plt.savefig('z_hist.png')
 plt.close()
+
+# plot durations of runs and tumbles
+
