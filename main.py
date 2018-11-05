@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from Cell3D import Cell3D
-from Cell2D import Cell2D
-from Cell1D import Cell1D
+from cell_3d import Cell3D
+from cell_2d import Cell2D
+from cell_1d import Cell1D
 
 class System:
     
