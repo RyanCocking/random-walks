@@ -10,6 +10,25 @@ class FigureTemplate(matplotlib.figure.Figure):
         super().__init__(*args, **kwargs)
 
 
+def scatter(data, axis_labels, dataname):
+    """2D scatter plot. Input lists taken in as [x,y]."""
+    fig = plt.figure(FigureClass=FigureTemplate)
+    figname = 'scatter_'+dataname
+
+    if len(data) != 2:
+        print('ERROR - Only 2D data may be shown on a scatter plot')
+        quit()
+
+    x = data[0]
+    y = data[1]
+
+    plt.plot(x, y, 'ko', ms=1)
+    plt.xlabel(axis_labels[0])
+    plt.ylabel(axis_labels[1])
+
+    plt.savefig(figname+'.png')
+    plt.close()
+
 def distribution(xdata, dataname):
     """Probability distribution of a 1D dataset"""
     fig = plt.figure(FigureClass=FigureTemplate)

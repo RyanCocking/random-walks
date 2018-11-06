@@ -4,7 +4,7 @@ import numpy as np
 from cell_3d import Cell3D
 from cell_2d import Cell2D
 from cell_1d import Cell1D
-import plot
+import figures as fg
 
 class System:
     
@@ -22,6 +22,17 @@ class System:
     np.random.seed(seed)
     
     box_size = 800  # micrometres
+
+class Data:
+
+    def mean_square(data,axis):
+        """Square every element of a dataset and calculate the mean"""
+        return np.mean(np.square(data),axis=axis)
+
+    def root_mean_square(data,axis):
+        """Square every element of a dataset and calculate the square
+        root of the mean"""
+        return np.sqrt(np.mean(np.square(data),axis=axis))
 
 
 # Create many swimming cells
@@ -41,18 +52,18 @@ positions = []
 for swimmer in swimmers:
     positions.append(np.array(swimmer.position_history))
 
-# Plot trajectory of first cell
-print(len(positions))
-plot.trajectory(positions, System.box_size)
+positions = np.array(positions)
+fg.trajectory(positions, System.box_size)
 
-quit()
+# take rms and mean square, averaged over all particles
+rms_x = Data.root_mean_square(positions[:,:,0],axis=0)
+rms_y = Data.root_mean_square(positions[:,:,1],axis=0)
 
-plt.xlabel('x ($\mu$m)')
-plt.ylabel('y ($\mu$m)')
-plt.xlim(-0.5*System.box_size,0.5*System.box_size)
-plt.ylim(-0.5*System.box_size,0.5*System.box_size)
-plt.plot([-0.5*System.box_size,0.5*System.box_size],[0,0],color='k',ls='--',
-         lw=0.5)
-plt.plot([0,0],[-0.5*System.box_size,0.5*System.box_size],color='k',ls='--',
-         lw=0.5)
-plt.savefig('xy_trajectory.png')
+msq_x = Data.mean_square(positions[:,:,0],axis=0)
+msq_y = Data.mean_square(positions[:,:,1],axis=0)
+
+fg.scatter([np.sqrt(System.timesteps),rms_x], ["$\sqrt{t}$","$x_{RMS}$ (m)"],
+        'sqrt_t_VS_x_rms')
+
+fg.scatter([System.timesteps,msq_x], ["t","$\overline{x^2}$ ($m^2$)"],
+        't_VS_x_mean_sq')
