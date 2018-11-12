@@ -35,6 +35,8 @@ class Data:
         return np.sqrt(np.mean(np.square(data),axis=axis))
 
 
+#Run code##################################
+
 # Create many swimming cells
 swimmers = []
 for i in range(System.total_cells):
@@ -53,7 +55,12 @@ for swimmer in swimmers:
     positions.append(np.array(swimmer.position_history))
 
 positions = np.array(positions)
-fg.trajectory(positions, System.box_size)
+#Plot data################################
+
+title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
+        System.step_size, System.seed)
+
+fg.trajectory(positions, System.box_size, title)
 
 # take rms and mean square, averaged over all particles
 rms_x = Data.root_mean_square(positions[:,:,0],axis=0)
@@ -63,7 +70,7 @@ msq_x = Data.mean_square(positions[:,:,0],axis=0)
 msq_y = Data.mean_square(positions[:,:,1],axis=0)
 
 fg.scatter([np.sqrt(System.timesteps),rms_x], ["$\sqrt{t}$","$x_{RMS}$ (m)"],
-        'sqrt_t_VS_x_rms')
+        'sqrt_t_VS_x_rms', title)
 
 fg.scatter([System.timesteps,msq_x], ["t","$\overline{x^2}$ ($m^2$)"],
-        't_VS_x_mean_sq')
+        't_VS_x_mean_sq', title)
