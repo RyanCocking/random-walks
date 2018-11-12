@@ -25,15 +25,30 @@ class System:
 
 class Data:
 
-    def mean_square(data,axis):
+    def mean_square(data, axis):
         """Square every element of a dataset and calculate the mean"""
         return np.mean(np.square(data),axis=axis)
 
-    def root_mean_square(data,axis):
+    def root_mean_square(data, axis):
         """Square every element of a dataset and calculate the square
         root of the mean"""
         return np.sqrt(np.mean(np.square(data),axis=axis))
 
+    def delay_time_mean(data, delay_time)
+        """For a given delay time, compute the mean of a dataset. The delay 
+        time is a segment of time that is moved through a dataset and is 
+        used to gain statistics equivalent to averaging over many cells, when
+        only one has been simulated.
+        
+        Delay time is in time steps."""
+
+        N = len(data) - delay_time  # Number of delay time segments
+        segment_data = np.zeros(N)
+
+        for i in range(0,N):
+            segment_data[i] = data[i+delay_time] - data[i]
+
+        return np.mean(segment_data)
 
 #Run code##################################
 
