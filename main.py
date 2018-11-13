@@ -3,14 +3,11 @@ import numpy as np
 
 from cell_3d import Cell3D
 from cell_2d import Cell2D
-from cell_1d import Cell1D
 import figures as fg
 
 class System:
     
     total_cells = 1  # number of swimmers (non-interacting)
-    
-    ndim = 2  # dimensionality of the system
 
     # time (seconds)
     max_time = 1e2
@@ -67,9 +64,9 @@ class ErrorChecks:
 # Create many swimming cells
 swimmers = []
 for i in range(System.total_cells):
-    swimmers.append(Cell2D(name='Escherichia coli', 
-        position=np.array([0.0,0.0]), speed=20, 
-        direction=np.array([1.0,1.0]), tumble_chance=0.1))
+    swimmers.append(Cell3D(name='Escherichia coli', 
+        position=np.array([0.0,0.0,0.0]), speed=20, 
+        direction=np.array([1.0,1.0,1.0]), tumble_chance=0.1))
 
 # Step through time in range 1 <= t <= tmax
 for time in System.timesteps[1:]:   
@@ -84,7 +81,6 @@ for swimmer in swimmers:
 
 positions = np.array(positions)
 #Plot data################################
-
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
         System.step_size, System.seed)
 
@@ -93,31 +89,36 @@ fg.trajectory(positions, System.box_size, title)
 # Positions of cell 1
 x = positions[0,:,0]
 y = positions[0,:,1]
+z = positions[0,:,2]
+
+# Displacement of cell 1
+r = np.linalg.norm(positions,axis=2)[0]
 
 # Delay time
 tau_values = System.timesteps[1:-1]  # tau time segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
-msq_r_tau = np.zeros(len(tau_values))
+
+msq_x_tau = np.zeros(len(tau_values))
+msq_y_tau = np.copy(msq_x_tau)
+msq_z_tau = np.copy(msq_x_tau)
+msq_r_tau = np.copy(msq_x_tau)
 
 # Loop over tau
 for i,segment in enumerate(segments,0):
-    msq_r_tau[i], tau = Data.delay_time_mean_square(x, segment,
+    msq_x_tau[i], tau = Data.delay_time_mean_square(x, segment, System.step_size) 
+    msq_y_tau[i], tau = Data.delay_time_mean_square(y, segment, System.step_size) 
+    msq_z_tau[i], tau = Data.delay_time_mean_square(z, segment, System.step_size) 
+
+    msq_r_tau[i], tau = Data.delay_time_mean_square(r, segment,
             System.step_size)  # delay time mean
 
-fg.scatter([tau_values,msq_r_tau], ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$"], 'delay_time', title)
 
-quit()
+# tau vs. mean square plots for xyz and r
+fg.scatter([tau_values,msq_x_tau], ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_x', title)
 
-# take rms and mean square, averaged over all particles
-rms_x = Data.root_mean_square(positions[:,:,0],axis=0)
-rms_y = Data.root_mean_square(positions[:,:,1],axis=0)
+fg.scatter([tau_values,msq_y_tau], ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_y', title)
 
-msq_x = Data.mean_square(positions[:,:,0],axis=0)
-msq_y = Data.mean_square(positions[:,:,1],axis=0)
+fg.scatter([tau_values,msq_z_tau], ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_z', title)
 
-fg.scatter([np.sqrt(System.timesteps),rms_x], ["$\sqrt{t}$","$x_{RMS}$ (m)"],
-        'sqrt_t_VS_x_rms', title)
-
-fg.scatter([System.timesteps,msq_x], ["t","$\overline{x^2}$ ($m^2$)"],
-        't_VS_x_mean_sq', title)
+fg.scatter([tau_values,msq_r_tau], ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_r', title)
