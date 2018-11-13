@@ -6,7 +6,8 @@ from mpl_toolkits.mplot3d import axes3d
 class FigureTemplate(matplotlib.figure.Figure):
     """Basic template for a 2D matplotlib figure"""
 
-    def __init__(self, *args, figtitle='template', **kwargs):
+    def __init__(self, *args, figsize=(10,10), figtitle='template',
+            **kwargs):
         super().__init__(*args, **kwargs)
 
 
@@ -28,6 +29,7 @@ def scatter(data, axis_labels, dataname, title):
     plt.xlabel(axis_labels[0])
     plt.ylabel(axis_labels[1])
 
+    plt.tight_layout()
     plt.savefig(figname+'.png')
     plt.close()
 
@@ -60,7 +62,7 @@ def trajectory(traj_all_cells, box_size, title):
         for cell_number,traj in enumerate(traj_all_cells,1):
             x = traj[:,0]
             y = traj[:,1]
-            plt.plot(x,y)
+            plt.plot(x,y,'-o',lw=0.5,ms=1.2)
             legend_labels.append('Cell {}'.format(cell_number))
 
         # Extra bits for clarity
@@ -81,5 +83,5 @@ def trajectory(traj_all_cells, box_size, title):
         quit()
 
     figname += dataname
-    plt.savefig(figname+'.png')
+    plt.savefig(figname+'.png',dpi=400)
     plt.close()

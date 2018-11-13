@@ -18,6 +18,7 @@ class Cell2D:
         self.tumble_chance = tumble_chance
 
         self.position_history = []
+        self.position_history.append(np.copy(self.position))
 
     
     def run(self, step_size):
