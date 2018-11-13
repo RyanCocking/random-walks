@@ -17,7 +17,7 @@ class System:
             endpoint=True)  # includes t=0
     
     # Random number seed - can be used to replicate trajectories
-    seed = 100
+    seed = 98
     np.random.seed(seed)
     
     box_size = 800  # cell container (micrometres)
@@ -84,7 +84,7 @@ positions = np.array(positions)
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
         System.step_size, System.seed)
 
-fg.trajectory(positions, System.box_size, title)
+#fg.trajectory(positions, System.box_size, title)
 
 # Positions of cell 1
 x = positions[0,:,0]
@@ -93,6 +93,9 @@ z = positions[0,:,2]
 
 # Displacement of cell 1
 r = np.linalg.norm(positions,axis=2)[0]
+
+# Trajectory plots - 3D IMPLEMENTATION MISSING
+fg.trajectory(positions, System.box_size, title)
 
 # Delay time
 tau_values = System.timesteps[1:-1]  # tau time segments in range 1 <= tau < tmax
