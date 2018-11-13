@@ -110,14 +110,14 @@ fg.scatter([tau_values,msq_r_tau], ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle
 quit()
 
 # take rms and mean square, averaged over all particles
-#rms_x = Data.root_mean_square(positions[:,:,0],axis=0)
-#rms_y = Data.root_mean_square(positions[:,:,1],axis=0)
+rms_x = Data.root_mean_square(positions[:,:,0],axis=0)
+rms_y = Data.root_mean_square(positions[:,:,1],axis=0)
 
-#msq_x = Data.mean_square(positions[:,:,0],axis=0)
-#msq_y = Data.mean_square(positions[:,:,1],axis=0)
+msq_x = Data.mean_square(positions[:,:,0],axis=0)
+msq_y = Data.mean_square(positions[:,:,1],axis=0)
 
-#fg.scatter([np.sqrt(System.timesteps),rms_x], ["$\sqrt{t}$","$x_{RMS}$ (m)"],
-#        'sqrt_t_VS_x_rms', title)
+fg.scatter([np.sqrt(System.timesteps),rms_x], ["$\sqrt{t}$","$x_{RMS}$ (m)"],
+        'sqrt_t_VS_x_rms', title)
 
-#fg.scatter([System.timesteps,msq_x], ["t","$\overline{x^2}$ ($m^2$)"],
-#        't_VS_x_mean_sq', title)
+fg.scatter([System.timesteps,msq_x], ["t","$\overline{x^2}$ ($m^2$)"],
+        't_VS_x_mean_sq', title)
