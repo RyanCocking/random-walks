@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as anim
 
 class FigureTemplate(matplotlib.figure.Figure):
     """Basic template for a 2D matplotlib figure"""
@@ -43,27 +44,22 @@ def distribution(xdata, dataname, title):
     plt.savefig(figname+'.png')
     plt.close()
 
-def trajectory(traj_all_cells, box_size, title):
+def trajectory(pos, box_size, title):
     """Plot trajectories of some positional data for a single cell in 
-    1-3 dimensions. \'traj_all_cells\' is 1D list of length equal to the 
-    number of cells. Each element contains the trajectory of a cell, 
-    which may be in 1, 2 or 3 dimensions."""
+    2-3 dimensions. 'pos' contains the trajectory of a cell, which may
+    be in two or three dimensions."""
 
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'trajectory_'
     plt.title(title)
-    ndim = traj_all_cells[0].shape[1]
+    ndim = pos.shape[1]
 
-    if ndim == 1:
-        dataname = 'x'
-    elif ndim == 2:
+    if ndim == 2:
         dataname = 'xy'
-        legend_labels = []
-        for cell_number,traj in enumerate(traj_all_cells,1):
-            x = traj[:,0]
-            y = traj[:,1]
-            plt.plot(x,y,'-o',lw=0.5,ms=1.2)
-            legend_labels.append('Cell {}'.format(cell_number))
+
+        x = pos[:,0]
+        y = pos[:,1]
+        plt.plot(x,y,'-o',lw=0.5,ms=1.2)            
 
         # Extra bits for clarity
         plt.xlabel('x ($\mu$m)')
@@ -73,13 +69,35 @@ def trajectory(traj_all_cells, box_size, title):
         plt.plot([-0.5*box_size,0.5*box_size],[0,0],color='k',ls='--',lw=0.5)
         plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
 
-        plt.legend(legend_labels)
-
     elif ndim == 3:
         dataname = 'xyz'
+
+        x = pos[:,0]
+        y = pos[:,1]
+        z = pos[:,2]
+
+        # Subplots: static 3D plot alongside three planar projections in 2D
+
+        # 3D rotating animation
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_title(title)
+
+        ax.set_xlabel('x ($\mu$m)')
+        ax.set_ylabel('y ($\mu$m)')
+        ax.set_zlabel('z ($\mu$m)')
+
+        # 3D point & line plot
+        ax.plot(x,y,z,'-o',lw=0.5,ms=1.2)
+
+        # rotate the axes and update
+        for angle in range(0, 720):
+            ax.view_init(30, angle)
+            plt.draw()
+            plt.pause(.001)
+
     else:
         print("ERROR - Unacceptable number ({}) of dimensions in positional "
-                "data; should be 1, 2 or 3.".format(ndim))
+                "data; should be 2 or 3.".format(ndim))
         quit()
 
     figname += dataname

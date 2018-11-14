@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from cell_3d import Cell3D
-from cell_2d import Cell2D
 import figures as fg
 
 class System:
@@ -52,6 +51,26 @@ class Data:
         return np.mean(np.square(segment_data),axis=0), delay_time
 
 
+class IO:
+
+    def load_track(filename):
+        """Load cell tracking data from a text file. Return time (s), 
+        positions (mu_m) and smoothed positions (mu_m)."""
+
+        t, x, y, z, xs, ys, zs = np.loadtxt(filename,unpack=True,usecols=[0,1,2,3,4,5,6])
+
+        # output track data in same array format as model
+        pos = []
+        pos_s = []
+        for i in range(0,len(x)):
+            pos.append(np.array([x[i],y[i],z[i]]))
+            pos_s.append(np.array([xs[i],ys[i],zs[i]]))
+
+        pos = np.array(pos)
+        pos_s = np.array(pos_s)
+
+        return t, pos, pos_s
+
 class ErrorChecks:
     
     # length of position array = length of timesteps array
@@ -59,9 +78,7 @@ class ErrorChecks:
     def example():
         pass
 
-#Run code##################################
-
-# Create many swimming cells
+# Instantiate cell classes
 swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
@@ -80,25 +97,37 @@ for swimmer in swimmers:
     positions.append(np.array(swimmer.position_history))
 
 positions = np.array(positions)
-#Plot data################################
-title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
-        System.step_size, System.seed)
 
-#fg.trajectory(positions, System.box_size, title)
-
-# Positions of cell 1
+# Model data
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
-
-# Displacement of cell 1
 r = np.linalg.norm(positions,axis=2)[0]
 
-# Trajectory plots - 3D IMPLEMENTATION MISSING
-fg.trajectory(positions, System.box_size, title)
+# Tracking data
+t_track, pos_track, pos_s_track = IO.load_track('tracks/track34sm.txt')
+x_track = pos_track[:,0]
+y_track = pos_track[:,1]
+z_track = pos_track[:,2]
+r_track  = np.linalg.norm(pos_track,axis=1)
+rs_track = np.linalg.norm(pos_s_track,axis=1)
 
-# Delay time
-tau_values = System.timesteps[1:-1]  # tau time segments in range 1 <= tau < tmax
+# System info for plot titles
+title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
+        System.step_size, System.seed)
+
+# Trajectory plots
+fg.trajectory(positions[0], System.box_size, title)
+
+# Tracking plots
+fg.trajectory(pos_track, System.box_size, title)
+
+fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','')
+fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','')
+fg.scatter([t_track,z_track],["t (s)","z ($\mu m$)"],'t_vs_z_track','')
+
+# Delay time averaging
+tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
 
@@ -107,21 +136,29 @@ msq_y_tau = np.copy(msq_x_tau)
 msq_z_tau = np.copy(msq_x_tau)
 msq_r_tau = np.copy(msq_x_tau)
 
-# Loop over tau
+# Loop over tau, compute mean squares
 for i,segment in enumerate(segments,0):
-    msq_x_tau[i], tau = Data.delay_time_mean_square(x, segment, System.step_size) 
-    msq_y_tau[i], tau = Data.delay_time_mean_square(y, segment, System.step_size) 
-    msq_z_tau[i], tau = Data.delay_time_mean_square(z, segment, System.step_size) 
+    msq_x_tau[i], tau = Data.delay_time_mean_square(x, segment, 
+            System.step_size) 
+    msq_y_tau[i], tau = Data.delay_time_mean_square(y, segment, 
+            System.step_size) 
+    msq_z_tau[i], tau = Data.delay_time_mean_square(z, segment, 
+            System.step_size) 
 
     msq_r_tau[i], tau = Data.delay_time_mean_square(r, segment,
             System.step_size)  # delay time mean
 
 
 # tau vs. mean square plots for xyz and r
-fg.scatter([tau_values,msq_x_tau], ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_x', title)
-
-fg.scatter([tau_values,msq_y_tau], ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_y', title)
-
-fg.scatter([tau_values,msq_z_tau], ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_z', title)
-
-fg.scatter([tau_values,msq_r_tau], ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$"], 'delay_time_VS_msq_r', title)
+fg.scatter([tau_values,msq_x_tau], 
+        ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$"],
+        'delay_time_VS_msq_x', title)
+fg.scatter([tau_values,msq_y_tau],
+        ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$"],
+        'delay_time_VS_msq_y', title)
+fg.scatter([tau_values,msq_z_tau],
+        ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$"],
+        'delay_time_VS_msq_z', title)
+fg.scatter([tau_values,msq_r_tau],
+        ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$"],
+        'delay_time_VS_msq_r', title)
