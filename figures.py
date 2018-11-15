@@ -7,7 +7,7 @@ import matplotlib.animation as anim
 class FigureTemplate(matplotlib.figure.Figure):
     """Basic template for a 2D matplotlib figure"""
 
-    def __init__(self, *args, figsize=(10,10), figtitle='template',
+    def __init__(self, *args, figsize=(16,16), figtitle='template',
             **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -44,7 +44,7 @@ def distribution(xdata, dataname, title):
     plt.savefig(figname+'.png')
     plt.close()
 
-def trajectory(pos, box_size, title):
+def trajectory(pos, box_size, title, tag=""):
     """Plot trajectories of some positional data for a single cell in 
     2-3 dimensions. 'pos' contains the trajectory of a cell, which may
     be in two or three dimensions."""
@@ -69,7 +69,7 @@ def trajectory(pos, box_size, title):
         plt.plot([-0.5*box_size,0.5*box_size],[0,0],color='k',ls='--',lw=0.5)
         plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
 
-        plt.savefig(figname+dataname+'.png')
+        plt.savefig(figname+dataname+tag+'.png')
         plt.close()
 
     elif ndim == 3:
@@ -79,14 +79,13 @@ def trajectory(pos, box_size, title):
         y = pos[:,1]
         z = pos[:,2]
 
-        # NEEDS 
         # combine 3d plot with 2d projections into a single figure
         # 3d plot
         ax3d = fig.add_subplot(221, projection='3d')
         ax3d.set_xlabel('x ($\mu$m)')
         ax3d.set_ylabel('y ($\mu$m)')
         ax3d.set_zlabel('z ($\mu$m)')
-        ax3d.plot(x,y,z,'-o',lw=0.5,ms=1.2) 
+        ax3d.plot(x,y,z,'-o',lw=0.5,ms=1.2)
 
         # x,y projection
         plt.subplot(222)
@@ -106,7 +105,7 @@ def trajectory(pos, box_size, title):
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
 
-        plt.savefig(figname+dataname+'.png')
+        plt.savefig(figname+dataname+tag+'.png',dpi=400)
         plt.close()
 
         # 3D rotating animation

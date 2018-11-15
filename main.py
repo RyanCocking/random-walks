@@ -116,11 +116,11 @@ rs_track = np.linalg.norm(pos_s_track,axis=1)
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
         System.step_size, System.seed)
 
-# Trajectory plots
-fg.trajectory(positions[0], System.box_size, title)
+# Trajectory plots (model)
+fg.trajectory(positions[0], System.box_size, title, tag='_model')
 
-# Tracking plots
-fg.trajectory(pos_track, System.box_size, title)
+# Tracking plots (experiment)
+fg.trajectory(pos_track, System.box_size, title, tag='_expt')
 
 fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','')
 fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','')
