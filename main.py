@@ -5,21 +5,24 @@ from cell_3d import Cell3D
 import figures as fg
 
 class System:
-    
-    total_cells = 1  # number of swimmers (non-interacting)
+   
+    total_cells = 1  # non-interacting
+    box_size = 800   # (micrometres (mu_m))
 
-    # time (seconds)
+    # time (s)
     max_time = 1e2
     step_size = 1
     total_steps = int(max_time / step_size)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
-    
-    # Random number seed - can be used to replicate trajectories
+   
+    diffusion_constant = 1e-5  # water (cm^2 / s)
+    brownian_step = 1e4*np.sqrt(2*diffusion_constant*step_size)  # (mu_m)
+
+    # random number seed
     seed = 98
     np.random.seed(seed)
     
-    box_size = 800  # cell container (micrometres)
 
 class Data:
 
@@ -127,6 +130,7 @@ title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time,
 
 # Trajectory plots (model)
 fg.trajectory(positions[0], System.box_size, title, tag='model_')
+fg.trajectory(brownian_positions[0], System.box_size, title, tag='bm_')
 
 # Tracking plots (experiment)
 fg.trajectory(pos_track, System.box_size, title, tag='expt_')
