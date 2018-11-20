@@ -132,7 +132,7 @@ title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time,
 fg.trajectory(positions[0], System.box_size, title, tag='model_')
 fg.trajectory(brownian_positions[0], System.box_size, title, tag='bm_')
 
-# Tracking plots (experiment)
+# Trajectory plots (experiment)
 fg.trajectory(pos_track, System.box_size, title, tag='expt_')
 fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','',tag='expt_')
 fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','',tag='expt_')
@@ -150,29 +150,29 @@ msq_r_tau = np.copy(msq_x_tau)
 
 # Loop over tau, compute mean squares
 for i,segment in enumerate(segments,0):
-    msq_x_tau[i], tau = Data.delay_time_mean_square(x, segment, 
+    msq_x_tau[i], tau = Data.delay_time_mean_square(xb, segment, 
             System.time_step) 
-    msq_y_tau[i], tau = Data.delay_time_mean_square(y, segment, 
+    msq_y_tau[i], tau = Data.delay_time_mean_square(yb, segment, 
             System.time_step) 
-    msq_z_tau[i], tau = Data.delay_time_mean_square(z, segment, 
+    msq_z_tau[i], tau = Data.delay_time_mean_square(zb, segment, 
             System.time_step) 
-    msq_r_tau[i], tau = Data.delay_time_mean_square(r, segment,
+    msq_r_tau[i], tau = Data.delay_time_mean_square(rb, segment,
             System.time_step)
 
 
 # tau vs. mean square plots for xyz and r
 fg.scatter([tau_values,msq_x_tau], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title,'model_')
+        'tau_VS_msq_x', title,'bm_')
 fg.scatter([tau_values,msq_y_tau],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title,'model_')
+        'tau_VS_msq_y', title,'bm_')
 fg.scatter([tau_values,msq_z_tau],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title,'model_')
+        'tau_VS_msq_z', title,'bm_')
 fg.scatter([tau_values,msq_r_tau],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_r', title, tag='model_')
+        'tau_VS_msq_r', title, tag='bm_')
 #fg.scatter([np.log10(tau_values),np.log10(msq_r_tau)],
 #        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
 #        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
