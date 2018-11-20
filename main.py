@@ -7,17 +7,17 @@ import figures as fg
 class System:
    
     total_cells = 1  # non-interacting
-    box_size = 800   # (micrometres (mu_m))
+    box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
     max_time = 1e2
-    step_size = 1
-    total_steps = int(max_time / step_size)
+    time_step = 1
+    total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
    
     diffusion_constant = 1e-5  # water (cm^2 / s)
-    brownian_step = 1e4*np.sqrt(2*diffusion_constant*step_size)  # (mu_m)
+    brownian_step = 1e4*np.sqrt(2*diffusion_constant*time_step)  # (mu_m)
 
     # random number seed
     seed = 98
@@ -93,16 +93,16 @@ for i in range(System.total_cells):
 for time in System.timesteps[1:]:   
     # Update every cell
     for swimmer in swimmers:
-        swimmer.update(System.step_size, 2*np.pi)
+        swimmer.update(System.brownian_step, System.time_step, 2*np.pi)
 
 # Create list of cell trajectories
 brownian_positions = []
 positions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))
-    positions.append(np.array(swimmer.position_history))
+    positions.append(np.array(swimmer.swim_history))
 
-brownian_positions = np.array(positions)
+brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
 
 # Model data
@@ -126,7 +126,7 @@ rs_track = np.linalg.norm(pos_s_track,axis=1)
 
 # System info for plot titles
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
-        System.step_size, System.seed)
+        System.time_step, System.seed)
 
 # Trajectory plots (model)
 fg.trajectory(positions[0], System.box_size, title, tag='model_')
@@ -151,14 +151,13 @@ msq_r_tau = np.copy(msq_x_tau)
 # Loop over tau, compute mean squares
 for i,segment in enumerate(segments,0):
     msq_x_tau[i], tau = Data.delay_time_mean_square(x, segment, 
-            System.step_size) 
+            System.time_step) 
     msq_y_tau[i], tau = Data.delay_time_mean_square(y, segment, 
-            System.step_size) 
+            System.time_step) 
     msq_z_tau[i], tau = Data.delay_time_mean_square(z, segment, 
-            System.step_size) 
-
+            System.time_step) 
     msq_r_tau[i], tau = Data.delay_time_mean_square(r, segment,
-            System.step_size)  # delay time mean
+            System.time_step)
 
 
 # tau vs. mean square plots for xyz and r
@@ -174,9 +173,9 @@ fg.scatter([tau_values,msq_z_tau],
 fg.scatter([tau_values,msq_r_tau],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title, tag='model_')
-fg.scatter([np.log10(tau_values),np.log10(msq_r_tau)],
-        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
-        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
+#fg.scatter([np.log10(tau_values),np.log10(msq_r_tau)],
+#        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
+#        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
 
 # x vs. t
 fg.scatter([System.timesteps,x],["t (s)","x ($\mu m$)"],'t_VS_x',title,tag='model_')

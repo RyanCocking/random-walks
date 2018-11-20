@@ -14,6 +14,18 @@ class FigureTemplate(mpl.figure.Figure):
         super().__init__(*args, **kwargs)
 
 
+    def clarity(box_size):
+        """Add extra features to a plot for clarity, such as dotted lines
+        at x,y = 0 and the bounding box edges."""
+
+        # Limit edges of plot
+        plt.xlim(-0.5*box_size,0.5*box_size)
+        plt.ylim(-0.5*box_size,0.5*box_size)
+        # Mark origin with dotted lines
+        plt.plot([-0.5*box_size,0.5*box_size],[0,0],color='k',ls='--',lw=0.5)
+        plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
+
+
 def scatter(data, axis_labels, dataname, title, tag="", regress=False):
     """2D scatter plot. Input lists taken in as [x,y]."""
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
@@ -73,13 +85,9 @@ def trajectory(pos, box_size, title, tag=""):
         y = pos[:,1]
         plt.plot(x,y,'-o',lw=0.5,ms=1.2)
 
-        # Extra bits for clarity
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
-        plt.xlim(-0.5*box_size,0.5*box_size)
-        plt.ylim(-0.5*box_size,0.5*box_size)
-        plt.plot([-0.5*box_size,0.5*box_size],[0,0],color='k',ls='--',lw=0.5)
-        plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
+        FigureTemplate.clarity(box_size)       
 
         plt.savefig(folder+tag+figname+dataname+'.png')
         plt.close()
@@ -104,6 +112,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.plot(x,y)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
+        FigureTemplate.clarity(box_size)       
         plt.savefig(folder+tag+figname+'xy.png',dpi=400)
         plt.close()
 
@@ -111,6 +120,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.plot(y,z)
         plt.xlabel('y ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
+        FigureTemplate.clarity(box_size)       
         plt.savefig(folder+tag+figname+'yz.png',dpi=400)
         plt.close()
 
@@ -118,6 +128,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.plot(x,z)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
+        FigureTemplate.clarity(box_size)       
         plt.savefig(folder+tag+figname+'xz.png',dpi=400)
         plt.close()
 
