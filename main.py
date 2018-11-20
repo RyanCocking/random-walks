@@ -126,6 +126,7 @@ msq_y  = msq[1]
 msq_z  = msq[2]
 msq_r  = msq[3]
 
+# brownian data
 mean_xb = mean[4]
 mean_yb = mean[5]
 mean_zb = mean[6]
@@ -134,6 +135,9 @@ msq_xb  = msq[4]
 msq_yb  = msq[5]
 msq_zb  = msq[6]
 msq_rb  = msq[7]
+
+#fg.scatter([tau_values,mean_rb],
+#        ["$\\tau$ (s)","$\langle r_{\\tau} \\rangle$ $(\mu m)$"],'tau_vs_mean_r',title,'bm_')
 
 # Loop over tau, compute mean squares
 #for i,segment in enumerate(segments,0):
