@@ -57,7 +57,8 @@ class IO:
         """Load cell tracking data from a text file. Return time (s), 
         positions (mu_m) and smoothed positions (mu_m)."""
 
-        t, x, y, z, xs, ys, zs = np.loadtxt(filename,unpack=True,usecols=[0,1,2,3,4,5,6])
+        t, x, y, z, xs, ys, zs = np.loadtxt(filename,unpack=True,
+                usecols=[0,1,2,3,4,5,6])
 
         # output track data in same array format as model
         pos = []
@@ -92,13 +93,21 @@ for time in System.timesteps[1:]:
         swimmer.update(System.step_size, 2*np.pi)
 
 # Create list of cell trajectories
+brownian_positions = []
 positions = []
 for swimmer in swimmers:
+    brownian_positions.append(np.array(swimmer.brownian_history))
     positions.append(np.array(swimmer.position_history))
 
+brownian_positions = np.array(positions)
 positions = np.array(positions)
 
 # Model data
+xb = brownian_positions[0,:,0]
+yb = brownian_positions[0,:,0]
+zb = brownian_positions[0,:,0]
+rb = np.linalg.norm(brownian_positions,axis=2)[0]
+
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
