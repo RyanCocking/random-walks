@@ -62,7 +62,8 @@ class Cell3D:
          
         self.run(step_size)
 
-        if np.random.random() > self.tumble_chance:
-            self.tumble(max_angle)
+        #Run-only
+        #if np.random.random() > self.tumble_chance:
+         #   self.tumble(max_angle)
 
         self.position_history.append(np.copy(self.position))

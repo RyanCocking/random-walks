@@ -83,7 +83,7 @@ swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
         position=np.array([0.0,0.0,0.0]), speed=20, 
-        direction=np.array([1.0,1.0,1.0]), tumble_chance=0.1))
+        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.1))
 
 # Step through time in range 1 <= t <= tmax
 for time in System.timesteps[1:]:   
@@ -117,16 +117,15 @@ title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time,
         System.step_size, System.seed)
 
 # Trajectory plots (model)
-fg.trajectory(positions[0], System.box_size, title, tag='_model')
+fg.trajectory(positions[0], System.box_size, title, tag='model_')
 
 # Tracking plots (experiment)
-fg.trajectory(pos_track, System.box_size, title, tag='_expt')
+fg.trajectory(pos_track, System.box_size, title, tag='expt_')
+fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','',tag='expt_')
+fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','',tag='expt_')
+fg.scatter([t_track,z_track],["t (s)","z ($\mu m$)"],'t_vs_z_track','',tag='expt_')
 
-fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','')
-fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','')
-fg.scatter([t_track,z_track],["t (s)","z ($\mu m$)"],'t_vs_z_track','')
-
-# Delay time averaging
+# Delay time averaging (model)
 tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
@@ -151,14 +150,20 @@ for i,segment in enumerate(segments,0):
 
 # tau vs. mean square plots for xyz and r
 fg.scatter([tau_values,msq_x_tau], 
-        ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$"],
-        'delay_time_VS_msq_x', title)
+        ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        'tau_VS_msq_x', title,'model_')
 fg.scatter([tau_values,msq_y_tau],
-        ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$"],
-        'delay_time_VS_msq_y', title)
+        ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        'tau_VS_msq_y', title,'model_')
 fg.scatter([tau_values,msq_z_tau],
-        ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$"],
-        'delay_time_VS_msq_z', title)
+        ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        'tau_VS_msq_z', title,'model_')
 fg.scatter([tau_values,msq_r_tau],
-        ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$"],
-        'delay_time_VS_msq_r', title)
+        ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        'tau_VS_msq_r', title, tag='model_')
+fg.scatter([np.log10(tau_values),np.log10(msq_r_tau)],
+        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
+        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
+
+# x vs. t
+fg.scatter([System.timesteps,x],["t (s)","x ($\mu m$)"],'t_VS_x',title,tag='model_')
