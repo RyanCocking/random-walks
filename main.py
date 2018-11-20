@@ -1,7 +1,10 @@
+# external libraries
 import matplotlib.pyplot as plt
 import numpy as np
 
+# custom classes
 from cell_3d import Cell3D
+from data import Data
 import figures as fg
 
 class System:
@@ -22,36 +25,6 @@ class System:
     # random number seed
     seed = 98
     np.random.seed(seed)
-    
-
-class Data:
-
-    def mean_square(data, axis):
-        """Square every element of a 1D dataset and calculate the mean"""
-        return np.mean(np.square(data),axis=0)
-
-    def root_mean_square(data, axis):
-        """Square every element of a 1D dataset and calculate the square
-        root of the mean"""
-        return np.sqrt(np.mean(np.square(data),axis=0))
-
-    def delay_time_mean_square(data, segment_size, step_size):
-        """For a given segment of time (delay time), compute the mean square 
-        of a 1D dataset. The segment is moved through a dataset and is used 
-        to gain statistics equivalent to averaging over many cells, when 
-        only one has been simulated.
-
-        Returns mean square of dataset and delay time."""
-
-        N = len(data) - segment_size  # Number of segment moves
-        segment_data = np.zeros(N)
-
-        for i in range(0,N):
-            segment_data[i] = data[i+segment_size] - data[i]
-        
-        delay_time = segment_size*step_size  # segment size (s)
-
-        return np.mean(np.square(segment_data),axis=0), delay_time
 
 
 class IO:
@@ -75,12 +48,6 @@ class IO:
 
         return t, pos, pos_s
 
-class ErrorChecks:
-    
-    # length of position array = length of timesteps array
-
-    def example():
-        pass
 
 # Instantiate cell classes
 swimmers = []
@@ -106,23 +73,27 @@ brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
 
 # Model data
+# brownian
 xb = brownian_positions[0,:,0]
 yb = brownian_positions[0,:,0]
 zb = brownian_positions[0,:,0]
 rb = np.linalg.norm(brownian_positions,axis=2)[0]
-
+# swimming
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.linalg.norm(positions,axis=2)[0]
-
 # Tracking data
 t_track, pos_track, pos_s_track = IO.load_track('tracks/track34sm.txt')
-x_track = pos_track[:,0]
-y_track = pos_track[:,1]
-z_track = pos_track[:,2]
-r_track  = np.linalg.norm(pos_track,axis=1)
-rs_track = np.linalg.norm(pos_s_track,axis=1)
+xt = pos_track[:,0]
+yt = pos_track[:,1]
+zt = pos_track[:,2]
+rt  = np.linalg.norm(pos_track,axis=1)
+rt_s = np.linalg.norm(pos_s_track,axis=1)
+
+#--------------------------------#
+#----------PLOTTING--------------#
+#--------------------------------#
 
 # System info for plot titles
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
@@ -134,48 +105,61 @@ fg.trajectory(brownian_positions[0], System.box_size, title, tag='bm_')
 
 # Trajectory plots (experiment)
 fg.trajectory(pos_track, System.box_size, title, tag='expt_')
-fg.scatter([t_track,x_track],["t (s)","x ($\mu m$)"],'t_vs_x_track','',tag='expt_')
-fg.scatter([t_track,y_track],["t (s)","y ($\mu m$)"],'t_vs_y_track','',tag='expt_')
-fg.scatter([t_track,z_track],["t (s)","z ($\mu m$)"],'t_vs_z_track','',tag='expt_')
+fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x','',tag='expt_')
+fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y','',tag='expt_')
+fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z','',tag='expt_')
 
 # Delay time averaging (model)
 tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
 
-msq_x_tau = np.zeros(len(tau_values))
-msq_y_tau = np.copy(msq_x_tau)
-msq_z_tau = np.copy(msq_x_tau)
-msq_r_tau = np.copy(msq_x_tau)
+datasets = [x,y,z,r,xb,yb,zb,rb]
+mean, msq, rms = Data.delay_time_loop(datasets, segments, System.time_step)
+
+mean_x = mean[0]
+mean_y = mean[1]
+mean_z = mean[2]
+mean_r = mean[3]
+msq_x  = msq[0]
+msq_y  = msq[1]
+msq_z  = msq[2]
+msq_r  = msq[3]
+
+mean_xb = mean[4]
+mean_yb = mean[5]
+mean_zb = mean[6]
+mean_rb = mean[7]
+msq_xb  = msq[4]
+msq_yb  = msq[5]
+msq_zb  = msq[6]
+msq_rb  = msq[7]
 
 # Loop over tau, compute mean squares
-for i,segment in enumerate(segments,0):
-    msq_x_tau[i], tau = Data.delay_time_mean_square(xb, segment, 
-            System.time_step) 
-    msq_y_tau[i], tau = Data.delay_time_mean_square(yb, segment, 
-            System.time_step) 
-    msq_z_tau[i], tau = Data.delay_time_mean_square(zb, segment, 
-            System.time_step) 
-    msq_r_tau[i], tau = Data.delay_time_mean_square(rb, segment,
-            System.time_step)
+#for i,segment in enumerate(segments,0):
+#    msq_x_tau[i], tau = Data.delay_time_mean_square(xb, segment, 
+#            System.time_step)[] 
+#    msq_y_tau[i], tau = Data.delay_time_mean_square(yb, segment, 
+#            System.time_step)[] 
+#    msq_z_tau[i], tau = Data.delay_time_mean_square(zb, segment, 
+#            System.time_step)[] 
+#    msq_r_tau[i], tau = Data.delay_time_mean_square(rb, segment,
+#            System.time_step)[]
 
 
 # tau vs. mean square plots for xyz and r
-fg.scatter([tau_values,msq_x_tau], 
+fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_x', title,'bm_')
-fg.scatter([tau_values,msq_y_tau],
+fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_y', title,'bm_')
-fg.scatter([tau_values,msq_z_tau],
+fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_z', title,'bm_')
-fg.scatter([tau_values,msq_r_tau],
+fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title, tag='bm_')
-#fg.scatter([np.log10(tau_values),np.log10(msq_r_tau)],
+#fg.scatter([np.log10(tau_values),np.log10(msq_rb)],
 #        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
 #        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
-
-# x vs. t
-fg.scatter([System.timesteps,x],["t (s)","x ($\mu m$)"],'t_VS_x',title,tag='model_')
