@@ -137,21 +137,6 @@ msq_yb  = msq[5]
 msq_zb  = msq[6]
 msq_rb  = msq[7]
 
-#fg.scatter([tau_values,mean_rb],
-#        ["$\\tau$ (s)","$\langle r_{\\tau} \\rangle$ $(\mu m)$"],'tau_VS_mean_r',title,'bm_')
-
-# Loop over tau, compute mean squares
-#for i,segment in enumerate(segments,0):
-#    msq_x_tau[i], tau = Data.delay_time_mean_square(xb, segment, 
-#            System.time_step)[] 
-#    msq_y_tau[i], tau = Data.delay_time_mean_square(yb, segment, 
-#            System.time_step)[] 
-#    msq_z_tau[i], tau = Data.delay_time_mean_square(zb, segment, 
-#            System.time_step)[] 
-#    msq_r_tau[i], tau = Data.delay_time_mean_square(rb, segment,
-#            System.time_step)[]
-
-
 # tau vs. mean square plots for xyz and r
 fit_xyz = 2*System.diffusion_constant*tau_values
 fit_r = 6*System.diffusion_constant*tau_values
@@ -167,7 +152,3 @@ fg.scatter([tau_values,msq_zb],
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
-
-#fg.scatter([np.log10(tau_values),np.log10(msq_rb)],
-#        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
-#        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
