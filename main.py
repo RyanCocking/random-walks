@@ -19,8 +19,9 @@ class System:
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
    
-    diffusion_constant = 1e-5  # water (cm^2 / s)
-    brownian_step = 1e4*np.sqrt(2*diffusion_constant*time_step)  # (mu_m)
+    diffusion_constant  = 1e-5  # water (cm^2 / s)
+    diffusion_constant *= 1e8   # (mu_m^2 / s)
+    #brownian_step = 1e4*np.sqrt(2*diffusion_constant*time_step)  # (mu_m)
 
     # random number seed
     seed = 98
@@ -60,7 +61,7 @@ for i in range(System.total_cells):
 for time in System.timesteps[1:]:   
     # Update every cell
     for swimmer in swimmers:
-        swimmer.update(System.brownian_step, System.time_step, 2*np.pi)
+        swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
 
 # Create list of cell trajectories
 brownian_positions = []
@@ -137,7 +138,7 @@ msq_zb  = msq[6]
 msq_rb  = msq[7]
 
 #fg.scatter([tau_values,mean_rb],
-#        ["$\\tau$ (s)","$\langle r_{\\tau} \\rangle$ $(\mu m)$"],'tau_vs_mean_r',title,'bm_')
+#        ["$\\tau$ (s)","$\langle r_{\\tau} \\rangle$ $(\mu m)$"],'tau_VS_mean_r',title,'bm_')
 
 # Loop over tau, compute mean squares
 #for i,segment in enumerate(segments,0):
@@ -154,10 +155,10 @@ msq_rb  = msq[7]
 # tau vs. mean square plots for xyz and r
 fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title,'bm_')
+        'tau_VS_msq_x', title,'bm_',final=False)
 fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title,'bm_')
+        'tau_VS_msq_y', title,'bm_',final=False)
 fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_z', title,'bm_')

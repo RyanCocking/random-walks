@@ -26,7 +26,7 @@ class FigureTemplate(mpl.figure.Figure):
         plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
 
 
-def scatter(data, axis_labels, dataname, title, tag="", regress=False):
+def scatter(data, axis_labels, dataname, title, tag="", regress=False, final=True):
     """2D scatter plot. Input lists taken in as [x,y]."""
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     ax = fig.add_subplot(111)
@@ -41,7 +41,7 @@ def scatter(data, axis_labels, dataname, title, tag="", regress=False):
     x = data[0]
     y = data[1]
 
-    plt.plot(x, y, 'ko', ms=1)
+    plt.plot(x, y, 'o', ms=1)
     plt.xlabel(axis_labels[0])
     plt.ylabel(axis_labels[1])
 
@@ -55,8 +55,11 @@ def scatter(data, axis_labels, dataname, title, tag="", regress=False):
         figname += '_linreg'
 
     plt.tight_layout()
-    plt.savefig(folder+tag+figname+'.png')
-    plt.close()
+
+    if final==True:
+        plt.savefig(folder+tag+figname+'.png')
+        plt.close()
+
 
 def distribution(xdata, dataname, title, tag=""):
     """Probability distribution of a 1D dataset"""

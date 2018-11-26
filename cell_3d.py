@@ -48,7 +48,8 @@ class Cell3D:
 
    
     def tumble(self, max_angle):
-        """Rotate randomly about the x, y and z axesby some input angle."""
+        """Randomly and independently rotate about the x, y and z axes 
+        between 0 and some maximum angle."""
         
         R_x = rotation_matrix_x(np.random.random()*max_angle)
         R_y = rotation_matrix_y(np.random.random()*max_angle)
@@ -58,45 +59,47 @@ class Cell3D:
         self.direction = np.matmul(self.direction, R_y)
         self.direction = np.matmul(self.direction, R_z)
 
+    
+    def compute_step_size(D, dt):
+        """Randomly determine the distance that the cell will step
+        by drawing from a Gaussian distribution centred at zero, with
+        a standard deviation that is proportional to the square root
+        of time."""
 
-    def trans_brownian_motion(self, bm_step):
+        mean = 0
+        std_dev = np.sqrt(2*D*dt)
+
+        return np.random.normal(mean,std_dev)
+
+
+    def trans_brownian_motion(self, diffusion_constant, time_step):
         """Thermal fluctuations in the x, y and z axes. Uses the Berg
         approach of having a 50% chance to move +/- a step in each
         axis. Add the Brownian steps to their own position history."""
 
-        rng_x = np.random.random()
-        rng_y = np.random.random()
-        rng_z = np.random.random()
+        # independent steps in x, y and z
+        dx = Cell3D.compute_step_size(diffusion_constant, time_step)
+        dy = Cell3D.compute_step_size(diffusion_constant, time_step)
+        dz = Cell3D.compute_step_size(diffusion_constant, time_step)
 
-        displacement = np.array([bm_step, bm_step, bm_step])
-
-        # swap signs if random numbers exceed 0.5
-        if rng_x > 0.5:
-            displacement[0] = -displacement[0]
-
-        if rng_y > 0.5:
-            displacement[1] = -displacement[1]
-
-        if rng_z > 0.5:
-            displacement[2] = -displacement[2]
-        
-        self.brownian_position += displacement
+        self.brownian_position += np.array([dx,dy,dz])
 
 
     def rot_brownian_motion(self):
         """Under construction."""
         pass
 
-    def update(self, bm_step, time_step, max_angle):
+
+    def update(self, diffusion_constant, time_step, max_tumble_angle):
         """Execute a run and attempt to tumble every timestep. Append data
         to arrays."""
 
-        self.trans_brownian_motion(bm_step)
+        self.trans_brownian_motion(diffusion_constant, time_step)
         #self.run(time_step)
 
         #Run-only
         #if np.random.random() > self.tumble_chance:
-        #    self.tumble(max_angle)
+        #    self.tumble(max_tumble_angle)
 
         self.brownian_history.append(np.copy(self.brownian_position))
         self.swim_history.append(np.copy(self.swim_position))
