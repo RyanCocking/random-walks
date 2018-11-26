@@ -26,8 +26,10 @@ class FigureTemplate(mpl.figure.Figure):
         plt.plot([0,0],[-0.5*box_size,0.5*box_size],color='k',ls='--',lw=0.5)
 
 
-def scatter(data, axis_labels, dataname, title, tag="", regress=False, final=True):
+def scatter(data, axis_labels, dataname, title, tag="", final=True, 
+            regress=False, fit=False, fitdata=[[0],[0]]):
     """2D scatter plot. Input lists taken in as [x,y]."""
+
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     ax = fig.add_subplot(111)
     figname = 'scatter_'+dataname
@@ -41,7 +43,7 @@ def scatter(data, axis_labels, dataname, title, tag="", regress=False, final=Tru
     x = data[0]
     y = data[1]
 
-    plt.plot(x, y, 'o', ms=1)
+    plt.plot(x, y, 'o', ms=0.5)
     plt.xlabel(axis_labels[0])
     plt.ylabel(axis_labels[1])
 
@@ -53,6 +55,13 @@ def scatter(data, axis_labels, dataname, title, tag="", regress=False, final=Tru
         plt.text(0.01,0.95,'Y = {:.4}X + {:.4}'.format(slope,yint), 
                 transform = ax.transAxes, color='red')
         figname += '_linreg'
+
+    # optional line fitting
+    if fit==True:
+        xfit = fitdata[0]
+        yfit = fitdata[1]
+        plt.plot(xfit,yfit,'r--',lw=1)
+        figname += '_fitted'
 
     plt.tight_layout()
 

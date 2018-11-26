@@ -26,14 +26,15 @@ def rotation_matrix_z(angle):
 
 class Cell3D:
     
-    def __init__(self, name, position, speed, direction, tumble_chance):
+    def __init__(self, name, position, speed, direction, tumble_chance_per_sec,
+                 time_step):
         self.name = name
         self.swim_position = position
         self.brownian_position = np.copy(position)
         self.speed = speed
         self.direction = direction
         self.velocity = self.speed * self.direction
-        self.tumble_chance = tumble_chance  # per second
+        self.tumble_chance = tumble_chance_per_sec*time_step
 
         self.swim_history = []
         self.swim_history.append(np.copy(self.swim_position))

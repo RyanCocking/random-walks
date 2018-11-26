@@ -13,8 +13,8 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 1e2
-    time_step = 1
+    max_time = 40
+    time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
@@ -54,7 +54,8 @@ swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
         position=np.array([0.0,0.0,0.0]), speed=20, 
-        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.1))
+        direction=np.array([1.0,0.0,0.0]), tumble_chance_per_sec=0.1, 
+        time_step=System.time_step))
 
 # Step through time in range 1 <= t <= tmax
 for time in System.timesteps[1:]:   
@@ -152,20 +153,21 @@ msq_rb  = msq[7]
 
 
 # tau vs. mean square plots for xyz and r
+fit_xyz = 2*System.diffusion_constant*tau_values
+fit_r = 6*System.diffusion_constant*tau_values
 fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title,tag='bm_')
+        'tau_VS_msq_x', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title,tag='bm_')
+        'tau_VS_msq_y', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title,tag='bm_')
+        'tau_VS_msq_z', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_r', title, tag='bm_')
+        'tau_VS_msq_r', title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
 
-print('hello')
 #fg.scatter([np.log10(tau_values),np.log10(msq_rb)],
 #        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
 #        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)
