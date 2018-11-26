@@ -70,13 +70,20 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         plt.close()
 
 
-def distribution(xdata, dataname, title, tag=""):
+def distribution(xdata, xlabel, dataname, title, tag=""):
     """Probability distribution of a 1D dataset"""
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'distribution_'+dataname
 
     n, bins, patches = plt.hist(xdata, bins='auto')
 
+    plt.xlabel(xlabel)
+    plt.ylabel('Frequency')
+    plt.title(title)
+
+    plt.grid(True)
+
+    plt.tight_layout()
     plt.savefig(folder+tag+figname+'.png')
     plt.close()
 
@@ -115,13 +122,13 @@ def trajectory(pos, box_size, title, tag=""):
         ax3d.set_xlabel('x ($\mu$m)')
         ax3d.set_ylabel('y ($\mu$m)')
         ax3d.set_zlabel('z ($\mu$m)')
-        ax3d.plot(x,y,z,'-o',lw=0.5,ms=1.2)
+        ax3d.plot(x,y,z,'-',lw=0.5,ms=1.2)
         plt.tight_layout()
         plt.savefig(folder+tag+figname+'3D.png')
         plt.close()
 
         # x,y projection
-        plt.plot(x,y,'-o',lw=0.5,ms=1.2)
+        plt.plot(x,y,'-',lw=0.5,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -129,7 +136,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # y,z projection
-        plt.plot(y,z,'-o',lw=0.5,ms=1.2)
+        plt.plot(y,z,'-',lw=0.5,ms=1.2)
         plt.xlabel('y ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -137,7 +144,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # x,z projection
-        plt.plot(x,z,'-o',lw=0.5,ms=1.2)
+        plt.plot(x,z,'-',lw=0.5,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       

@@ -50,6 +50,7 @@ class IO:
 
 
 # Instantiate cell classes
+print('Creating cells...')
 swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
@@ -57,13 +58,19 @@ for i in range(System.total_cells):
         direction=np.array([1.0,0.0,0.0]), tumble_chance_per_sec=0.1, 
         time_step=System.time_step))
 
+print('Done')
+
 # Step through time in range 1 <= t <= tmax
+print('Computing cell trajectories...')
 for time in System.timesteps[1:]:   
     # Update every cell
     for swimmer in swimmers:
         swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
 
+print('Done')
+
 # Create list of cell trajectories
+print('Extracting model data...')
 brownian_positions = []
 positions = []
 for swimmer in swimmers:
@@ -84,18 +91,61 @@ x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.linalg.norm(positions,axis=2)[0]
+print('Done')
+
 # Tracking data
+print('Extracting experimental data...')
 t_track, pos_track, pos_s_track = IO.load_track('tracks/track34sm.txt')
 xt = pos_track[:,0]
 yt = pos_track[:,1]
 zt = pos_track[:,2]
 rt  = np.linalg.norm(pos_track,axis=1)
 rt_s = np.linalg.norm(pos_s_track,axis=1)
+print('Done')
+
+# Delay time averaging (model)
+print('Averaging data...')
+tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
+segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
+        dtype='int')  # width (in integer steps) of tau segments
+
+datasets = [x,y,z,r,xb,yb,zb,rb]
+data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
+    System.time_step)
+
+# swimming data
+x_tau = data_tau[0]
+y_tau = data_tau[1]
+z_tau = data_tau[2]
+r_tau = data_tau[3]
+mean_x = mean[0]
+mean_y = mean[1]
+mean_z = mean[2]
+mean_r = mean[3]
+msq_x  = msq[0]
+msq_y  = msq[1]
+msq_z  = msq[2]
+msq_r  = msq[3]
+
+# brownian data
+xb_tau = data_tau[4]
+yb_tau = data_tau[5]
+zb_tau = data_tau[6]
+rb_tau = data_tau[7]
+mean_xb = mean[4]
+mean_yb = mean[5]
+mean_zb = mean[6]
+mean_rb = mean[7]
+msq_xb  = msq[4]
+msq_yb  = msq[5]
+msq_zb  = msq[6]
+msq_rb  = msq[7]
+print('Done')
 
 #--------------------------------#
 #----------PLOTTING--------------#
 #--------------------------------#
-
+print('Plotting graphs...')
 # System info for plot titles
 title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
         System.time_step, System.seed)
@@ -109,33 +159,6 @@ fg.trajectory(pos_track, System.box_size, title, tag='expt_')
 fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x','',tag='expt_')
 fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y','',tag='expt_')
 fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z','',tag='expt_')
-
-# Delay time averaging (model)
-tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
-segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
-        dtype='int')  # width (in integer steps) of tau segments
-
-datasets = [x,y,z,r,xb,yb,zb,rb]
-mean, msq, rms = Data.delay_time_loop(datasets, segments, System.time_step)
-
-mean_x = mean[0]
-mean_y = mean[1]
-mean_z = mean[2]
-mean_r = mean[3]
-msq_x  = msq[0]
-msq_y  = msq[1]
-msq_z  = msq[2]
-msq_r  = msq[3]
-
-# brownian data
-mean_xb = mean[4]
-mean_yb = mean[5]
-mean_zb = mean[6]
-mean_rb = mean[7]
-msq_xb  = msq[4]
-msq_yb  = msq[5]
-msq_zb  = msq[6]
-msq_rb  = msq[7]
 
 # tau vs. mean square plots for xyz and r
 fit_xyz = 2*System.diffusion_constant*tau_values
@@ -152,3 +175,11 @@ fg.scatter([tau_values,msq_zb],
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
+
+# histograms
+fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',title,tag='bm_')
+fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',title,tag='bm_')
+fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',title,tag='bm_')
+fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',title,tag='bm_')
+
+print('Done')
