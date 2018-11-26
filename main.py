@@ -21,7 +21,6 @@ class System:
    
     diffusion_constant  = 1e-5  # water (cm^2 / s)
     diffusion_constant *= 1e8   # (mu_m^2 / s)
-    #brownian_step = 1e4*np.sqrt(2*diffusion_constant*time_step)  # (mu_m)
 
     # random number seed
     seed = 98
@@ -76,8 +75,8 @@ positions = np.array(positions)
 # Model data
 # brownian
 xb = brownian_positions[0,:,0]
-yb = brownian_positions[0,:,0]
-zb = brownian_positions[0,:,0]
+yb = brownian_positions[0,:,1]
+zb = brownian_positions[0,:,2]
 rb = np.linalg.norm(brownian_positions,axis=2)[0]
 # swimming
 x = positions[0,:,0]
@@ -155,16 +154,18 @@ msq_rb  = msq[7]
 # tau vs. mean square plots for xyz and r
 fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title,'bm_',final=False)
+        'tau_VS_msq_x', title,tag='bm_')
 fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title,'bm_',final=False)
+        'tau_VS_msq_y', title,tag='bm_')
 fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title,'bm_')
+        'tau_VS_msq_z', title,tag='bm_')
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title, tag='bm_')
+
+print('hello')
 #fg.scatter([np.log10(tau_values),np.log10(msq_rb)],
 #        ["log$_{10}[\\tau]$","log$_{10}[\langle r^2_{\\tau} \\rangle]$"],
 #        'log10_tau_VS_log10_msq_r', title, tag='model_',regress=True)

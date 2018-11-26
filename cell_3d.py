@@ -33,7 +33,7 @@ class Cell3D:
         self.speed = speed
         self.direction = direction
         self.velocity = self.speed * self.direction
-        self.tumble_chance = tumble_chance
+        self.tumble_chance = tumble_chance  # per second
 
         self.swim_history = []
         self.swim_history.append(np.copy(self.swim_position))

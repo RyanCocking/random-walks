@@ -112,7 +112,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # x,y projection
-        plt.plot(x,y)
+        plt.plot(x,y,'-o',lw=0.5,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -120,7 +120,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # y,z projection
-        plt.plot(y,z)
+        plt.plot(y,z,'-o',lw=0.5,ms=1.2)
         plt.xlabel('y ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -128,7 +128,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # x,z projection
-        plt.plot(x,z)
+        plt.plot(x,z,'-o',lw=0.5,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
