@@ -13,8 +13,8 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 40
-    time_step = 0.02
+    max_time = 100
+    time_step = 1
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
