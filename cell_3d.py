@@ -25,7 +25,7 @@ def rotation_matrix_z(angle):
                      [0,0,1]])
 
 class Cell3D:
-    
+
     def __init__(self, name, position, speed, direction, tumble_chance_per_sec,
                  time_step):
         self.name = name
@@ -35,32 +35,34 @@ class Cell3D:
         self.direction = direction
         self.velocity = self.speed * self.direction
         self.tumble_chance = tumble_chance_per_sec*time_step
+        self.run_duration = 0
 
         self.swim_history = []
         self.swim_history.append(np.copy(self.swim_position))
         self.brownian_history = []
         self.brownian_history.append(np.copy(self.brownian_position))
+        self.run_durations = []
 
-    
+
     def run(self, time_step):
         """Move forwards in current direction."""
         self.velocity = self.speed * self.direction
         self.swim_position += (self.velocity * time_step)
 
-   
+
     def tumble(self, max_angle):
         """Randomly and independently rotate about the x, y and z axes 
         between 0 and some maximum angle."""
-        
+
         R_x = rotation_matrix_x(np.random.random()*max_angle)
         R_y = rotation_matrix_y(np.random.random()*max_angle)
         R_z = rotation_matrix_z(np.random.random()*max_angle)
-        
+
         self.direction = np.matmul(self.direction, R_x)
         self.direction = np.matmul(self.direction, R_y)
         self.direction = np.matmul(self.direction, R_z)
 
-    
+
     def compute_step_size(D, dt):
         """Randomly determine the distance that the cell will step
         by drawing from a Gaussian distribution centred at zero, with
@@ -95,12 +97,14 @@ class Cell3D:
         """Execute a run and attempt to tumble every timestep. Append data
         to arrays."""
 
+        self.run(time_step)
+        self.run_duration += 1
         self.trans_brownian_motion(diffusion_constant, time_step)
-        #self.run(time_step)
 
-        #Run-only
-        #if np.random.random() > self.tumble_chance:
-        #    self.tumble(max_tumble_angle)
+        if np.random.random() < self.tumble_chance:
+            self.tumble(max_tumble_angle)
+            self.run_durations.append(self.run_duration*time_step)
+            self.run_duration = 0
 
         self.brownian_history.append(np.copy(self.brownian_position))
         self.swim_history.append(np.copy(self.swim_position))

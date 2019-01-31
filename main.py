@@ -13,18 +13,22 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 100
+    max_time = 10000
     time_step = 1
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
-   
+
     diffusion_constant  = 1e-5  # water (cm^2 / s)
     diffusion_constant *= 1e8   # (mu_m^2 / s)
 
     # random number seed
     seed = 98
     np.random.seed(seed)
+
+    title = "Time = {}s, step size = {}s, seed = {}".format(max_time,
+        time_step, seed)
+
 
 
 class IO:
@@ -68,6 +72,8 @@ for time in System.timesteps[1:]:
         swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
 
 print('Done')
+fg.distribution(swimmer.run_durations,'Run duration (s)','run_duration',System.title,tag='dur_')
+quit()
 
 # Create list of cell trajectories
 print('Extracting model data...')
@@ -147,8 +153,6 @@ print('Done')
 #--------------------------------#
 print('Plotting graphs...')
 # System info for plot titles
-title = "Time = {}s, step size = {}s, seed = {}".format(System.max_time, 
-        System.time_step, System.seed)
 
 # Trajectory plots (model)
 fg.trajectory(positions[0], System.box_size, title, tag='model_')
@@ -177,9 +181,12 @@ fg.scatter([tau_values,msq_rb],
         'tau_VS_msq_r', title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
 
 # histograms
+# brownian displacements
 fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',title,tag='bm_')
 fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',title,tag='bm_')
 fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',title,tag='bm_')
 fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',title,tag='bm_')
+
+# run durations
 
 print('Done')
