@@ -1,5 +1,6 @@
 # external libraries
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
 import numpy as np
 
 # custom classes
@@ -73,19 +74,35 @@ for time in System.timesteps[1:]:
 
 print('Done')
 plt.title(System.title)
-plt.hist(swimmer.run_durations, bins='auto', density=True, label='Model')
+plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
 x=np.linspace(1,max(swimmer.run_durations),num=50)
 fit=0.1*np.exp(-0.1*x)
 plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
 plt.yscale('log')
 plt.ylim(0.001,1)
 plt.xlim(1,50)
-plt.ylabel('Probability')
+plt.ylabel('Probability density')
 plt.xlabel('Run duration (s)')
-plt.grid(True)
+#plt.grid(True)
 plt.legend()
 plt.savefig('test.png')
+plt.yscale('linear')
+plt.ylim(0,0.2)
+plt.savefig('test2.png')
 plt.close()
+
+ang=np.array(swimmer.tumble_angles)*(180.0/3.14159)
+plt.hist(ang, bins='auto', density=True, edgecolor='black')
+x=np.linspace(0,180,num=50)
+fit=mlab.normpdf(x,90,49)
+plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=90^\circ$, $\sigma=49^\circ$')
+plt.xlim(0,180)
+plt.ylim(0,0.012)
+plt.ylabel('Probability density')
+plt.xlabel('Tumble angle between subsequent runs (deg)')
+#plt.grid(True)
+plt.legend()
+plt.savefig('angle.png')
 quit()
 
 # Create list of cell trajectories
