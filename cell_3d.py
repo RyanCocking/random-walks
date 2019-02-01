@@ -42,6 +42,7 @@ class Cell3D:
         self.brownian_history = []
         self.brownian_history.append(np.copy(self.brownian_position))
         self.run_durations = []
+        self.tumble_angles = []
 
 
     def run(self, time_step):
@@ -54,10 +55,12 @@ class Cell3D:
         """Randomly and independently rotate about the x, y and z axes 
         between 0 and some maximum angle."""
 
+        #construct rotation matrices
         R_x = rotation_matrix_x(np.random.random()*max_angle)
         R_y = rotation_matrix_y(np.random.random()*max_angle)
         R_z = rotation_matrix_z(np.random.random()*max_angle)
 
+        #perform rotation
         self.direction = np.matmul(self.direction, R_x)
         self.direction = np.matmul(self.direction, R_y)
         self.direction = np.matmul(self.direction, R_z)
@@ -101,8 +104,12 @@ class Cell3D:
         self.run_duration += 1
         self.trans_brownian_motion(diffusion_constant, time_step)
 
+        old_direction = self.direction
+
         if np.random.random() < self.tumble_chance:
             self.tumble(max_tumble_angle)
+            angle = np.arccos(np.dot(old_direction,self.direction))
+            self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration*time_step)
             self.run_duration = 0
 
