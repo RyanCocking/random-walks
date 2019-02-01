@@ -13,7 +13,7 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 10000
+    max_time = 50000
     time_step = 1
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
@@ -72,7 +72,20 @@ for time in System.timesteps[1:]:
         swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
 
 print('Done')
-fg.distribution(swimmer.run_durations,'Run duration (s)','run_duration',System.title,tag='dur_')
+plt.title(System.title)
+plt.hist(swimmer.run_durations, bins='auto', density=True, label='Model')
+x=np.linspace(1,max(swimmer.run_durations),num=50)
+fit=0.1*np.exp(-0.1*x)
+plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
+plt.yscale('log')
+plt.ylim(0.001,1)
+plt.xlim(1,50)
+plt.ylabel('Probability')
+plt.xlabel('Run duration (s)')
+plt.grid(True)
+plt.legend()
+plt.savefig('test.png')
+plt.close()
 quit()
 
 # Create list of cell trajectories
