@@ -14,8 +14,8 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 10000
-    time_step = 1
+    max_time = 30
+    time_step = 0.08
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
@@ -60,7 +60,7 @@ swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
         position=np.array([0.0,0.0,0.0]), speed=20*System.time_step, 
-        direction=np.array([1.0,0.0,0.0]), tumble_chance_per_sec=0.1*System.time_step, 
+        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.1, 
         time_step=System.time_step))
 
 print('Done')
@@ -96,8 +96,8 @@ plt.close()
 ang=np.array(swimmer.tumble_angles)*(180.0/3.14159)
 plt.hist(ang, bins='auto', density=True, edgecolor='black')
 x=np.linspace(0,180,num=50)
-fit=mlab.normpdf(x,90,49)
-plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=90^\circ$, $\sigma=49^\circ$')
+fit=mlab.normpdf(x,90,39)
+plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=90^\circ$, $\sigma=39^\circ$')
 plt.xlim(0,180)
 plt.ylim(0,0.012)
 plt.ylabel('Probability density')
@@ -105,7 +105,7 @@ plt.xlabel('Tumble angle between subsequent runs (deg)')
 plt.legend()
 plt.savefig('angle.png')
 #==========================================================================
-quit()
+
 
 # Create list of cell trajectories
 print('Extracting model data...')
@@ -187,11 +187,11 @@ print('Plotting graphs...')
 # System info for plot titles
 
 # Trajectory plots (model)
-fg.trajectory(positions[0], System.box_size, title, tag='model_')
-fg.trajectory(brownian_positions[0], System.box_size, title, tag='bm_')
+fg.trajectory(positions[0], System.box_size, System.title, tag='model_')
+fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')
 
 # Trajectory plots (experiment)
-fg.trajectory(pos_track, System.box_size, title, tag='expt_')
+fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
 fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x','',tag='expt_')
 fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y','',tag='expt_')
 fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z','',tag='expt_')
@@ -201,23 +201,23 @@ fit_xyz = 2*System.diffusion_constant*tau_values
 fit_r = 6*System.diffusion_constant*tau_values
 fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
+        'tau_VS_msq_x', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
+        'tau_VS_msq_y', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
+        'tau_VS_msq_z', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_r', title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
+        'tau_VS_msq_r', System.title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])
 
 # histograms
 # brownian displacements
-fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',title,tag='bm_')
-fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',title,tag='bm_')
-fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',title,tag='bm_')
-fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',title,tag='bm_')
+fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',System.title,tag='bm_')
+fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',System.title,tag='bm_')
+fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',System.title,tag='bm_')
+fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_')
 
 # run durations
 
