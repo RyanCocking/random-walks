@@ -101,7 +101,7 @@ class Cell3D:
         to arrays."""
 
         self.run(time_step)
-        self.run_duration += 1
+        self.run_duration += time_step
         self.trans_brownian_motion(diffusion_constant, time_step)
 
         old_direction = self.direction
@@ -110,7 +110,7 @@ class Cell3D:
             self.tumble(max_tumble_angle)
             angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
-            self.run_durations.append(self.run_duration*time_step)
+            self.run_durations.append(self.run_duration)
             self.run_duration = 0
 
         self.brownian_history.append(np.copy(self.brownian_position))
