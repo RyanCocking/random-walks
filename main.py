@@ -59,7 +59,7 @@ print('Creating cells...')
 swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
-        position=np.array([0.0,0.0,0.0]), speed=20*System.time_step, 
+        position=np.array([0.0,0.0,0.0]), speed=20, 
         direction=np.array([1.0,0.0,0.0]), tumble_chance=0.1, 
         time_step=System.time_step))
 
