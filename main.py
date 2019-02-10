@@ -14,8 +14,8 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 30
-    time_step = 0.08
+    max_time = 10000
+    time_step = 1
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
@@ -82,7 +82,7 @@ fit=0.1*np.exp(-0.1*x)
 plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
 plt.yscale('log')
 plt.ylim(0.001,1)
-plt.xlim(1,50)
+plt.xlim(min(x),max(x))
 plt.ylabel('Probability density')
 plt.xlabel('Run duration (s)')
 #plt.grid(True)
@@ -98,14 +98,14 @@ plt.hist(ang, bins='auto', density=True, edgecolor='black')
 x=np.linspace(0,180,num=50)
 fit=mlab.normpdf(x,90,39)
 plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=90^\circ$, $\sigma=39^\circ$')
-plt.xlim(0,180)
+plt.xlim(min(ang),max(ang))
 plt.ylim(0,0.012)
 plt.ylabel('Probability density')
 plt.xlabel('Tumble angle between subsequent runs (deg)')
 plt.legend()
 plt.savefig('angle.png')
 #==========================================================================
-
+quit()
 
 # Create list of cell trajectories
 print('Extracting model data...')
