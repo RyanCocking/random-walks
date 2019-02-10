@@ -14,7 +14,7 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 50000
+    max_time = 10000
     time_step = 1
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
@@ -59,8 +59,8 @@ print('Creating cells...')
 swimmers = []
 for i in range(System.total_cells):
     swimmers.append(Cell3D(name='Escherichia coli', 
-        position=np.array([0.0,0.0,0.0]), speed=20, 
-        direction=np.array([1.0,0.0,0.0]), tumble_chance_per_sec=0.1, 
+        position=np.array([0.0,0.0,0.0]), speed=20*System.time_step, 
+        direction=np.array([1.0,0.0,0.0]), tumble_chance_per_sec=0.1*System.time_step, 
         time_step=System.time_step))
 
 print('Done')
@@ -73,6 +73,8 @@ for time in System.timesteps[1:]:
         swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
 
 print('Done')
+
+# PLACE THIS IN A FUNCTION========
 plt.title(System.title)
 plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
 x=np.linspace(1,max(swimmer.run_durations),num=50)
@@ -100,9 +102,9 @@ plt.xlim(0,180)
 plt.ylim(0,0.012)
 plt.ylabel('Probability density')
 plt.xlabel('Tumble angle between subsequent runs (deg)')
-#plt.grid(True)
 plt.legend()
 plt.savefig('angle.png')
+#==========================================================================
 quit()
 
 # Create list of cell trajectories
