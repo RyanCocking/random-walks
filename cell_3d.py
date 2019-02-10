@@ -41,6 +41,8 @@ class Cell3D:
         self.swim_history.append(np.copy(self.swim_position))
         self.brownian_history = []
         self.brownian_history.append(np.copy(self.brownian_position))
+        self.combined_history = []
+        self.combined_history.append(np.copy(self.swim_position)+np.copy(self.brownian_position))
         self.run_durations = []
         self.tumble_angles = []
 
@@ -115,3 +117,4 @@ class Cell3D:
 
         self.brownian_history.append(np.copy(self.brownian_position))
         self.swim_history.append(np.copy(self.swim_position))
+        self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))
