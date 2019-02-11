@@ -14,8 +14,8 @@ class System:
     box_size = 2000   # (micrometres (mu_m))
 
     # time (s)
-    max_time = 10000
-    time_step = 1
+    max_time = 34
+    time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0,max_time,num=total_steps+1,
             endpoint=True)  # includes t=0
@@ -105,7 +105,7 @@ plt.xlabel('Tumble angle between subsequent runs (deg)')
 plt.legend()
 plt.savefig('angle.png')
 #==========================================================================
-quit()
+#quit()
 
 # Create list of cell trajectories
 print('Extracting model data...')
