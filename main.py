@@ -104,6 +104,7 @@ plt.ylabel('Probability density')
 plt.xlabel('Tumble angle between subsequent runs (deg)')
 plt.legend()
 plt.savefig('angle.png')
+plt.close()
 #==========================================================================
 #quit()
 
@@ -184,7 +185,6 @@ print('Done')
 #----------PLOTTING--------------#
 #--------------------------------#
 print('Plotting graphs...')
-# System info for plot titles
 
 # Trajectory plots (model)
 fg.trajectory(positions[0], System.box_size, System.title, tag='model_')
