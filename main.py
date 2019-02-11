@@ -11,7 +11,7 @@ import figures as fg
 class System:
    
     total_cells = 1  # non-interacting
-    box_size = 2000   # (micrometres (mu_m))
+    box_size = 1000   # (micrometres (mu_m))
 
     # time (s)
     max_time = 34
@@ -192,9 +192,9 @@ fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')
 
 # Trajectory plots (experiment)
 fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
-fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x','',tag='expt_')
-fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y','',tag='expt_')
-fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z','',tag='expt_')
+fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
+fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
+fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
 
 # tau vs. mean square plots for xyz and r
 fit_xyz = 2*System.diffusion_constant*tau_values
