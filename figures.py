@@ -75,13 +75,13 @@ def distribution(xdata, xlabel, dataname, title, tag=""):
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'distribution_'+dataname
 
-    n, bins, patches = plt.hist(xdata, bins='auto')
+    n, bins, patches = plt.hist(xdata, bins='auto',edgecolor='black')
 
     plt.xlabel(xlabel)
     plt.ylabel('Frequency')
     plt.title(title)
 
-    plt.grid(True)
+    plt.grid(False)
 
     plt.tight_layout()
     plt.savefig(folder+tag+figname+'.png',dpi=400)
@@ -94,7 +94,6 @@ def trajectory(pos, box_size, title, tag=""):
 
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'trajectory_'
-    plt.title(title)
     ndim = pos.shape[1]
 
     if ndim == 2:
@@ -106,8 +105,8 @@ def trajectory(pos, box_size, title, tag=""):
 
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
-        FigureTemplate.clarity(box_size)       
-
+        FigureTemplate.clarity(box_size)
+        plt.title(title)
         plt.savefig(folder+tag+figname+dataname+'.png',dpi=400)
         plt.close()
 
@@ -124,6 +123,7 @@ def trajectory(pos, box_size, title, tag=""):
         ax3d.set_zlabel('z ($\mu$m)')
         ax3d.plot(x,y,z,'-',lw=0.5,ms=1.2)
         plt.tight_layout()
+        plt.title(title)
         plt.savefig(folder+tag+figname+'3D.png',dpi=400)
         plt.close()
 
@@ -132,6 +132,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
         FigureTemplate.clarity(box_size)       
+        plt.title(title)
         plt.savefig(folder+tag+figname+'xy.png',dpi=400)
         plt.close()
 
@@ -140,6 +141,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.xlabel('y ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
+        plt.title(title)
         plt.savefig(folder+tag+figname+'yz.png',dpi=400)
         plt.close()
 
@@ -148,6 +150,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
+        plt.title(title)
         plt.savefig(folder+tag+figname+'xz.png',dpi=400)
         plt.close()
 
