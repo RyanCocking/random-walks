@@ -70,18 +70,22 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         plt.close()
 
 
-def distribution(xdata, xlabel, dataname, title, tag=""):
+def distribution(xdata, xlabel, dataname, title, tag="", fit=False, fitdata=[[0],[0]]):
     """Probability distribution of a 1D dataset"""
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'distribution_'+dataname
 
-    n, bins, patches = plt.hist(xdata, bins='auto',edgecolor='black')
+    n, bins, patches = plt.hist(xdata, bins='auto',edgecolor='black',density=True)
 
     plt.xlabel(xlabel)
-    plt.ylabel('Frequency')
+    plt.ylabel('Probability density')
     plt.title(title)
 
-    plt.grid(False)
+    if fit:
+        xfit = fitdata[0]
+        yfit = fitdata[1]
+        plt.plot(xfit,yfit,'r-',lw=1)
+        figname += '_fitted'
 
     plt.tight_layout()
     plt.savefig(folder+tag+figname+'.png',dpi=400)
