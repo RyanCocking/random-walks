@@ -193,7 +193,10 @@ fg.scatter([tau_values,msq_rb],
 fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',System.title,tag='bm_')
 fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',System.title,tag='bm_')
 fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',System.title,tag='bm_')
-fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_')
+
+x=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
+fit=mlab.normpdf(x,0,np.sqrt(2*System.diffusion_constant*System.time_step))
+fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_',fit=True,fitdata=[x,fit])
 
 # run durations
 
