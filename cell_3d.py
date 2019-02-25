@@ -126,7 +126,10 @@ class Cell3D:
 
     def rot_brownian_motion(self):
         """Under construction."""
-        pass
+
+        dtheta = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
+        dphi = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
+        self.direction = rotate(self.direction,dtheta,dphi)
 
 
     def update(self, diffusion_constant, time_step, max_tumble_angle):
