@@ -99,27 +99,27 @@ class Cell3D:
         self.direction = rotate(self.direction,tumble_angle,rev_angle)
 
 
-    def compute_step_size(D, dt):
-        """Randomly determine the distance that the cell will step
-        by drawing from a Gaussian distribution centred at zero, with
-        a standard deviation that is proportional to the square root
-        of time."""
+    def draw_brownian_step(D, dt):
+        """
+        Return a value drawn from a normal distribution centred at zero,
+        with variance proportional to 2*D*dt. D is the diffusion coefficient
+        of translational or rotational Brownian motion.
+        """
 
-        mean = 0
-        std_dev = np.sqrt(2*D*dt)
-
-        return np.random.normal(mean,std_dev)
+        return np.random.normal(0,np.sqrt(2*D*dt))
 
 
     def trans_brownian_motion(self, diffusion_constant, time_step):
-        """Thermal fluctuations in the x, y and z axes. Uses the Berg
+        """
+        Thermal fluctuations in the x, y and z axes. Uses the Berg
         approach of having a 50% chance to move +/- a step in each
-        axis. Add the Brownian steps to their own position history."""
+        axis. Add the Brownian steps to their own position history.
+        """
 
         # independent steps in x, y and z
-        dx = Cell3D.compute_step_size(diffusion_constant, time_step)
-        dy = Cell3D.compute_step_size(diffusion_constant, time_step)
-        dz = Cell3D.compute_step_size(diffusion_constant, time_step)
+        dx = Cell3D.draw_brownian_step(diffusion_constant, time_step)
+        dy = Cell3D.draw_brownian_step(diffusion_constant, time_step)
+        dz = Cell3D.draw_brownian_step(diffusion_constant, time_step)
 
         self.brownian_position += np.array([dx,dy,dz])
 
@@ -140,7 +140,7 @@ class Cell3D:
         old_direction = self.direction
 
         if np.random.random() < self.tumble_chance:
-            self.tumble(np.deg2rad(68),1.0)
+            self.tumble(np.deg2rad(68),0.25*np.pi)
             angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)

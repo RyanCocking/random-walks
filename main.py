@@ -1,6 +1,6 @@
 # external libraries
 import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
+import scipy.stats as ss
 import numpy as np
 
 # custom classes
@@ -70,11 +70,11 @@ plt.ylim(0,0.2)
 plt.savefig('test2.png')
 plt.close()
 
-ang=np.array(swimmer.tumble_angles)*(180.0/3.14159)
+ang=np.rad2deg(np.array(swimmer.tumble_angles))
 plt.hist(ang, bins='auto', density=True, edgecolor='black')
-x=np.linspace(0,180,num=50)
-fit=mlab.normpdf(x,90,39)
-plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=90^\circ$, $\sigma=39^\circ$')
+x=np.linspace(-180,180,num=50)
+fit=ss.norm.pdf(x,68,45)
+plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=68^\circ$, $\sigma=45^\circ$')
 plt.xlim(min(ang),max(ang))
 plt.ylim(0,0.012)
 plt.ylabel('Probability density')
@@ -195,7 +195,7 @@ fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',System.title,t
 fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',System.title,tag='bm_')
 
 x=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
-fit=mlab.normpdf(x,0,np.sqrt(2*System.diffusion_constant*System.time_step))
+fit=ss.norm.pdf(x,0,np.sqrt(2*System.diffusion_constant*System.time_step))
 fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_',fit=True,fitdata=[x,fit])
 
 # run durations
