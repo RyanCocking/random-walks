@@ -1,6 +1,6 @@
 import numpy as np
 
-def rotation_matrix_x(angle):
+def Rx(angle):
     sin = np.sin(angle)
     cos = np.cos(angle)
 
@@ -8,7 +8,7 @@ def rotation_matrix_x(angle):
                      [0,cos,-sin],
                      [0,sin,cos]])
 
-def rotation_matrix_y(angle):
+def Ry(angle):
     sin = np.sin(angle)
     cos = np.cos(angle)
 
@@ -16,13 +16,41 @@ def rotation_matrix_y(angle):
                      [0,1,0],
                      [-sin,0,cos]])
 
-def rotation_matrix_z(angle):
+def Rz(angle):
     sin = np.sin(angle)
     cos = np.cos(angle)
 
     return np.array([[cos,-sin,0],
                      [sin,cos,0],
                      [0,0,1]])
+
+def rotate(rhat,theta,phi):
+    """
+    Transform a unit vector, rhat, to align with the z-axis. Perform rotations
+    by theta radians about the y-axis and phi radians about the z-axis (in that 
+    order). Inverse-transform the vector back to its original position. 
+    Spherical polar coordinates are used here (rhat, theta, phi), with 
+    anticlockwise rotations.
+    """
+    
+    # Initial polar (alpha) and azimuthal (beta) angles of unit vector rhat
+    alpha=np.arccos(rhat[2]/1.0)
+    alpha*=np.sign(rhat[0])
+    beta=np.arctan(rhat[1]/rhat[0])
+        
+    # Align to z-axis
+    rhat=np.matmul(Rz(-beta),rhat)
+    rhat=np.matmul(Ry(-alpha),rhat)
+    
+    # Rotate relative to transformed frame of reference
+    rhat=np.matmul(Ry(theta),rhat)
+    rhat=np.matmul(Rz(phi),rhat)
+    
+    # Return to original frame
+    rhat=np.matmul(Ry(alpha),rhat)
+    rhat=np.matmul(Rz(beta),rhat)
+    
+    return rhat
 
 class Cell3D:
 
@@ -53,19 +81,22 @@ class Cell3D:
         self.swim_position += (self.velocity * time_step)
 
 
-    def tumble(self, max_angle):
-        """Randomly and independently rotate about the x, y and z axes 
-        between 0 and some maximum angle."""
+    def tumble(self, tumble_mean, tumble_stddev):
+        """
+        Perform a tumble on the unit direction vector of the cell. Tumble
+        angle (theta) is drawn from a normal distribution defined by the input
+        arguments. Following a rotation by theta, the vector is revolved
+        through an angle phi, drawn from a uniform random distribution within
+        the range 0 <= phi < 2pi radians.
+        
+        Experimental data for E.coli suggests tumbles are biased in the forward
+        direction, with a mean tumble angle of ~68 degrees [HC Berg, Random Walks
+        in Biology, p86; 1993].
+        """
 
-        #construct rotation matrices
-        R_x = rotation_matrix_x(np.random.random()*max_angle)
-        R_y = rotation_matrix_y(np.random.random()*max_angle)
-        R_z = rotation_matrix_z(np.random.random()*max_angle)
-
-        #perform rotation
-        self.direction = np.matmul(self.direction, R_x)
-        self.direction = np.matmul(self.direction, R_y)
-        self.direction = np.matmul(self.direction, R_z)
+        tumble_angle = np.random.normal(tumble_mean,tumble_stddev)
+        rev_angle = np.random.uniform(0,2.0*np.pi)
+        self.direction = rotate(self.direction,tumble_angle,rev_angle)
 
 
     def compute_step_size(D, dt):
@@ -109,7 +140,7 @@ class Cell3D:
         old_direction = self.direction
 
         if np.random.random() < self.tumble_chance:
-            self.tumble(max_tumble_angle)
+            self.tumble(np.deg2rad(68),1.0)
             angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
