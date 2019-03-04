@@ -7,28 +7,8 @@ import numpy as np
 from cell_3d import Cell3D
 from data import Data
 from params import System
+from my_io import IO
 import figures as fg
-
-class IO:
-
-    def load_track(filename):
-        """Load cell tracking data from a text file. Return time (s), 
-        positions (mu_m) and smoothed positions (mu_m)."""
-
-        t, x, y, z, xs, ys, zs = np.loadtxt(filename,unpack=True,
-                usecols=[0,1,2,3,4,5,6])
-
-        # output track data in same array format as model
-        pos = []
-        pos_s = []
-        for i in range(0,len(x)):
-            pos.append(np.array([x[i],y[i],z[i]]))
-            pos_s.append(np.array([xs[i],ys[i],zs[i]]))
-
-        pos = np.array(pos)
-        pos_s = np.array(pos_s)
-
-        return t, pos, pos_s
 
 
 # Instantiate cell classes
@@ -71,17 +51,18 @@ plt.ylim(0,0.2)
 plt.savefig('test2.png')
 plt.close()
 
-ang=np.rad2deg(np.array(swimmer.tumble_angles))
+ang=np.rad2deg(Data.compute_angles(swimmer.swim_history))
+#ang=np.rad2deg(np.array(swimmer.tumble_angles))
 plt.hist(ang, bins='auto', density=True, edgecolor='black')
-x=np.linspace(-180,180,num=50)
-fit=ss.norm.pdf(x,68,45)
-plt.plot(x,fit,'r',lw=2,label='Gaussian; $\mu=68^\circ$, $\sigma=45^\circ$')
+x=np.linspace(-20,20,num=100)
+fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(2*System.rot_diffusion_constant*System.time_step)))
+plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{4\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{4D_r\Delta t}}\right]$")
 plt.xlim(min(ang),max(ang))
-plt.ylim(0,0.012)
+#plt.ylim(0,0.012)
 plt.ylabel('Probability density')
 plt.xlabel('Tumble angle between subsequent runs (deg)')
 plt.legend()
-plt.savefig('angle.png')
+plt.savefig('angle.png',dpi=400)
 plt.close()
 #==========================================================================
 
@@ -91,7 +72,7 @@ brownian_positions = []
 positions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))
-    positions.append(np.array(swimmer.combined_history))  # swim_history (pure r+t), combined_history (r+t+BM)
+    positions.append(np.array(swimmer.swim_history))  # swim_history (pure r+t), combined_history (r+t+BM)
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)

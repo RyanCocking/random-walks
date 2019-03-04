@@ -79,7 +79,7 @@ class Cell3D:
         """Move forwards in current direction."""
         self.velocity = self.speed * self.direction
         self.swim_position += (self.velocity * time_step)
-
+        self.run_duration += time_step
 
     def tumble(self, tumble_mean, tumble_stddev):
         """
@@ -140,14 +140,14 @@ class Cell3D:
         to arrays."""
 
         self.run(time_step)
-        self.run_duration += time_step
         self.trans_brownian_motion(diffusion_constant, time_step)
-        self.rot_brownian_motion(rot_diffusion_constant, time_step)
-
         old_direction = self.direction
 
+        self.rot_brownian_motion(rot_diffusion_constant, time_step)
+
+
         if np.random.random() < self.tumble_chance:
-            self.tumble(np.deg2rad(68),0.25*np.pi)
+            #self.tumble(np.deg2rad(68),0.25*np.pi)
             angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)

@@ -105,7 +105,7 @@ def trajectory(pos, box_size, title, tag=""):
 
         x = pos[:,0]
         y = pos[:,1]
-        plt.plot(x,y,'-o',lw=0.5,ms=1.2)
+        plt.plot(x,y,'-o',lw=1,ms=1.2)
 
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
@@ -125,14 +125,14 @@ def trajectory(pos, box_size, title, tag=""):
         ax3d.set_xlabel('x ($\mu$m)')
         ax3d.set_ylabel('y ($\mu$m)')
         ax3d.set_zlabel('z ($\mu$m)')
-        ax3d.plot(x,y,z,'-',lw=0.5,ms=1.2)
+        ax3d.plot(x,y,z,'-',lw=1,ms=1.2)
         plt.tight_layout()
         plt.title(title)
         plt.savefig(folder+tag+figname+'3D.png',dpi=400)
         plt.close()
 
         # x,y projection
-        plt.plot(x,y,'-',lw=0.5,ms=1.2)
+        plt.plot(x,y,'-',lw=1,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('y ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -141,7 +141,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # y,z projection
-        plt.plot(y,z,'-',lw=0.5,ms=1.2)
+        plt.plot(y,z,'-',lw=1,ms=1.2)
         plt.xlabel('y ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
@@ -150,7 +150,7 @@ def trajectory(pos, box_size, title, tag=""):
         plt.close()
 
         # x,z projection
-        plt.plot(x,z,'-',lw=0.5,ms=1.2)
+        plt.plot(x,z,'-',lw=1,ms=1.2)
         plt.xlabel('x ($\mu$m)')
         plt.ylabel('z ($\mu$m)')
         FigureTemplate.clarity(box_size)       
