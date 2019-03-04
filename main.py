@@ -47,7 +47,8 @@ print('Computing cell trajectories...')
 for time in System.timesteps[1:]:   
     # Update every cell
     for swimmer in swimmers:
-        swimmer.update(System.diffusion_constant, System.time_step, 2*np.pi)
+        swimmer.update(System.diffusion_constant, System.rot_diffusion_constant,
+                       System.time_step, 2*np.pi)
 
 print('Done')
 
@@ -90,7 +91,7 @@ brownian_positions = []
 positions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))
-    positions.append(np.array(swimmer.swim_history))
+    positions.append(np.array(swimmer.combined_history))  # swim_history (pure r+t), combined_history (r+t+BM)
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)

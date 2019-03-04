@@ -88,7 +88,7 @@ class Cell3D:
         arguments. Following a rotation by theta, the vector is revolved
         through an angle phi, drawn from a uniform random distribution within
         the range 0 <= phi < 2pi radians.
-        
+
         Experimental data for E.coli suggests tumbles are biased in the forward
         direction, with a mean tumble angle of ~68 degrees [HC Berg, Random Walks
         in Biology, p86; 1993].
@@ -124,21 +124,25 @@ class Cell3D:
         self.brownian_position += np.array([dx,dy,dz])
 
 
-    def rot_brownian_motion(self):
+    def rot_brownian_motion(self, rot_diffusion_constant, time_step):
         """Under construction."""
 
+        # independent rotations in theta and phi
         dtheta = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
         dphi = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
+
         self.direction = rotate(self.direction,dtheta,dphi)
 
 
-    def update(self, diffusion_constant, time_step, max_tumble_angle):
+    def update(self, diffusion_constant, rot_diffusion_constant, time_step,
+               max_tumble_angle):
         """Execute a run and attempt to tumble every timestep. Append data
         to arrays."""
 
         self.run(time_step)
         self.run_duration += time_step
         self.trans_brownian_motion(diffusion_constant, time_step)
+        self.rot_brownian_motion(rot_diffusion_constant, time_step)
 
         old_direction = self.direction
 
