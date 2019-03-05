@@ -51,7 +51,7 @@ plt.ylim(0,0.2)
 plt.savefig('test2.png')
 plt.close()
 
-ang=np.rad2deg(Data.compute_angles(swimmer.swim_history))
+ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
 #ang=np.rad2deg(np.array(swimmer.tumble_angles))
 plt.hist(ang, bins='auto', density=True, edgecolor='black')
 x=np.linspace(-20,20,num=100)

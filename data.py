@@ -64,3 +64,24 @@ class Data:
             rms_list.append(rms)
     
         return segmented_data_list, mean_list, meansq_list, rms_list
+
+    def compute_angles(coords):
+        """
+        For a cell trajectory of N coordinates (x,y,z), compute the
+        dot product between the two displacement vectors produced by
+        groups of three points, to produce a N-2 array of angles.
+        
+        coords is a 3*N array; an array with each of N elements 
+        containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
+        """
+
+        angles = np.zeros(coords.shape[0]-2)
+
+        for i in range(0,len(coords)-2):
+            r1 = np.array(coords[i+1] - coords[i])
+            r2 = np.array(coords[i+2] - coords[i+1])
+            mag_r1 = np.abs(np.linalg.norm(r1))
+            mag_r2 = np.abs(np.linalg.norm(r2))
+            angles[i] = np.arccos(np.dot(r1,r2)/(mag_r1*mag_r2))
+            
+        return angles
