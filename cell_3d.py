@@ -66,11 +66,12 @@ class Cell3D:
         self.run_duration = 0
 
         self.swim_history = []
-        self.swim_history.append(np.copy(self.swim_position))
+        self.swim_history.append(np.copy(self.swim_position))  # run & tumble
         self.brownian_history = []
-        self.brownian_history.append(np.copy(self.brownian_position))
+        self.brownian_history.append(np.copy(self.brownian_position))  # translational brownian motion
         self.combined_history = []
         self.combined_history.append(np.copy(self.swim_position)+np.copy(self.brownian_position))
+        self.angle_history = [0.0]  # angular deviation (between subsequent time steps)
         self.run_durations = []
         self.tumble_angles = []
 
@@ -141,14 +142,15 @@ class Cell3D:
 
         self.run(time_step)
         self.trans_brownian_motion(diffusion_constant, time_step)
+        
         old_direction = self.direction
-
         self.rot_brownian_motion(rot_diffusion_constant, time_step)
+        rbm_angle = np.arccos(np.dot(old_direction,self.direction))
 
-
+        # still editing - want to keep tumble angle separate from rbm angle
         if np.random.random() < self.tumble_chance:
-            #self.tumble(np.deg2rad(68),0.25*np.pi)
-            angle = np.arccos(np.dot(old_direction,self.direction))
+            self.tumble(np.deg2rad(68),0.25*np.pi)
+            tumble_angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
@@ -156,3 +158,4 @@ class Cell3D:
         self.brownian_history.append(np.copy(self.brownian_position))
         self.swim_history.append(np.copy(self.swim_position))
         self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))
+        self.rbm_angle_history.append(rbm_angle)
