@@ -72,13 +72,15 @@ print('Done')
 #-------------------------------DATA EXTRACTION------------------------------#
 #----------------------------------------------------------------------------#
 
-# Create list of cell trajectories
 print('Extracting model data...')
+
+# Create list of cell trajectories (this loop might not be needed, e.g. make
+# everything a numpy array and do away with python lists)
 brownian_positions = []
 positions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))
-    positions.append(np.array(swimmer.swim_history))  # swim_history (pure r+t), combined_history (r+t+BM)
+    positions.append(np.array(swimmer.combined_history))  # swim_history (pure r&t), combined_history (r&t + TBM)
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
@@ -148,6 +150,7 @@ print('Done')
 #----------------------------------------------------------------------------#
 #-----------------------------------PLOTTING---------------------------------#
 #----------------------------------------------------------------------------#
+
 print('Plotting graphs...')
 
 # Trajectory plots (model)
