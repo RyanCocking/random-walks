@@ -10,6 +10,9 @@ from params import System
 from my_io import IO
 import figures as fg
 
+#----------------------------------------------------------------------------#
+#----------------------------------SIMULATION--------------------------------#
+#----------------------------------------------------------------------------#
 
 # Instantiate cell classes
 print('Creating cells...')
@@ -32,39 +35,42 @@ for time in System.timesteps[1:]:
 
 print('Done')
 
-# PLACE THIS IN A FUNCTION========
-plt.title(System.title)
-plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
-x=np.linspace(1,max(swimmer.run_durations),num=50)
-fit=0.1*np.exp(-0.1*x)
-plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
-plt.yscale('log')
-plt.ylim(0.001,1)
-plt.xlim(min(x),max(x))
-plt.ylabel('Probability density')
-plt.xlabel('Run duration (s)')
-#plt.grid(True)
-plt.legend()
-plt.savefig('test.png')
-plt.yscale('linear')
-plt.ylim(0,0.2)
-plt.savefig('test2.png')
-plt.close()
+## PLACE THIS IN A FUNCTION========
+#plt.title(System.title)
+#plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
+#x=np.linspace(1,max(swimmer.run_durations),num=50)
+#fit=0.1*np.exp(-0.1*x)
+#plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
+#plt.yscale('log')
+#plt.ylim(0.001,1)
+#plt.xlim(min(x),max(x))
+#plt.ylabel('Probability density')
+#plt.xlabel('Run duration (s)')
+##plt.grid(True)
+#plt.legend()
+#plt.savefig('test.png')
+#plt.yscale('linear')
+#plt.ylim(0,0.2)
+#plt.savefig('test2.png')
+#plt.close()
 
-ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
-#ang=np.rad2deg(np.array(swimmer.tumble_angles))
-plt.hist(ang, bins='auto', density=True, edgecolor='black')
-x=np.linspace(-20,20,num=100)
-fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(2*System.rot_diffusion_constant*System.time_step)))
-plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{4\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{4D_r\Delta t}}\right]$")
-plt.xlim(min(ang),max(ang))
-#plt.ylim(0,0.012)
-plt.ylabel('Probability density')
-plt.xlabel('Tumble angle between subsequent runs (deg)')
-plt.legend()
-plt.savefig('angle.png',dpi=400)
-plt.close()
-#==========================================================================
+#ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
+##ang=np.rad2deg(np.array(swimmer.tumble_angles))
+#plt.hist(ang, bins='auto', density=True, edgecolor='black')
+#x=np.linspace(-20,20,num=100)
+#fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(2*System.rot_diffusion_constant*System.time_step)))
+#plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{4\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{4D_r\Delta t}}\right]$")
+#plt.xlim(min(ang),max(ang))
+##plt.ylim(0,0.012)
+#plt.ylabel('Probability density')
+#plt.xlabel('Tumble angle between subsequent runs (deg)')
+#plt.legend()
+#plt.savefig('angle.png',dpi=400)
+#plt.close()
+
+#----------------------------------------------------------------------------#
+#-------------------------------DATA EXTRACTION------------------------------#
+#----------------------------------------------------------------------------#
 
 # Create list of cell trajectories
 print('Extracting model data...')
@@ -139,9 +145,9 @@ msq_zb  = msq[6]
 msq_rb  = msq[7]
 print('Done')
 
-#--------------------------------#
-#----------PLOTTING--------------#
-#--------------------------------#
+#----------------------------------------------------------------------------#
+#-----------------------------------PLOTTING---------------------------------#
+#----------------------------------------------------------------------------#
 print('Plotting graphs...')
 
 # Trajectory plots (model)
