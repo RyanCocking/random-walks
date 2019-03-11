@@ -137,25 +137,46 @@ class Cell3D:
 
     def update(self, diffusion_constant, rot_diffusion_constant, time_step,
                max_tumble_angle):
-        """Execute a run and attempt to tumble every timestep. Append data
-        to arrays."""
+        """Called once per time step:
+             1) Record the original direction in which the cell is facing.
+             2) Perform a run in this direction and increment the run duration.
+             3) Undergo translational Brownian motion (TBM).
+             4) Undergo rotational Brownian motion (RBM).
+             5) Compute rbm_angle with respect to the cell's original direction.
+             6) Draw a uniformly-distributed random number and tumble if this is
+                smaller than the tumble probability per time step, tumble_chance.
+                6.1) Compute new angle with respect to old direction. This is the
+                     resultant angle from both RBM and tumbling.
+                6.2) Append this angle to a list of tumble angles. The final length
+                     of this list will be equal to the number of tumbles that
+                     occurred during the simulation.
+                6.3) Append the run duration to a list and reset the duration to
+                     zero ('end' the current run).
+             7) Append data to lists and exit.
+        """
+
+        old_direction = self.direction
 
         self.run(time_step)
-        self.trans_brownian_motion(diffusion_constant, time_step)
-        
-        old_direction = self.direction
+        self.trans_brownian_motion(diffusion_constant, time_step)        
         self.rot_brownian_motion(rot_diffusion_constant, time_step)
-        rbm_angle = np.arccos(np.dot(old_direction,self.direction))
 
-        # still editing - want to keep tumble angle separate from rbm angle
+        # Compute angle of rotation
+        rbm_angle = np.arccos(np.dot(old_direction,self.direction))
+        angle = rbm_angle
+
+        # Perform tumble if dice roll successful
         if np.random.random() < self.tumble_chance:
             self.tumble(np.deg2rad(68),0.25*np.pi)
-            tumble_angle = np.arccos(np.dot(old_direction,self.direction))
+            angle = np.arccos(np.dot(old_direction,self.direction))
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
 
-        self.brownian_history.append(np.copy(self.brownian_position))
-        self.swim_history.append(np.copy(self.swim_position))
-        self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))
-        self.rbm_angle_history.append(rbm_angle)
+        
+        # Append data to lists
+        self.brownian_history.append(np.copy(self.brownian_position))  # TBM
+        self.swim_history.append(np.copy(self.swim_position))  # Runs
+        self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # Runs and TBM
+        self.rbm_angle_history.append(rbm_angle)  # RBM
+        self.angle_history.append(angle)  # RBM and tumbles
