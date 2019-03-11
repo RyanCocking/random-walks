@@ -20,7 +20,7 @@ swimmers = []
 for i in range(1):
     swimmers.append(Cell3D(name='Escherichia coli', 
         position=np.array([0.0,0.0,0.0]), speed=20, 
-        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.0, 
+        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.1, 
         time_step=System.time_step))
 
 print('Done')

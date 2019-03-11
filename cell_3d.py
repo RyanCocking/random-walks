@@ -71,6 +71,7 @@ class Cell3D:
         self.brownian_history.append(np.copy(self.brownian_position))  # translational brownian motion
         self.combined_history = []
         self.combined_history.append(np.copy(self.swim_position)+np.copy(self.brownian_position))
+        self.rbm_angle_history = [0.0]  # angular deviation (between subsequent time steps)
         self.angle_history = [0.0]  # angular deviation (between subsequent time steps)
         self.run_durations = []
         self.tumble_angles = []
@@ -143,7 +144,7 @@ class Cell3D:
              3) Undergo translational Brownian motion (TBM).
              4) Undergo rotational Brownian motion (RBM).
              5) Compute rbm_angle with respect to the cell's original direction.
-             6) Draw a uniformly-distributed random number and tumble if this is
+             6) Draw a uniformly-distributed random number and tumble IF this is
                 smaller than the tumble probability per time step, tumble_chance.
                 6.1) Compute new angle with respect to old direction. This is the
                      resultant angle from both RBM and tumbling.
@@ -162,17 +163,20 @@ class Cell3D:
         self.rot_brownian_motion(rot_diffusion_constant, time_step)
 
         # Compute angle of rotation
-        rbm_angle = np.arccos(np.dot(old_direction,self.direction))
-        angle = rbm_angle
+        rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # rbm wrt original
 
         # Perform tumble if dice roll successful
         if np.random.random() < self.tumble_chance:
             self.tumble(np.deg2rad(68),0.25*np.pi)
-            angle = np.arccos(np.dot(old_direction,self.direction))
+            angle = np.arccos(np.dot(old_direction,self.direction))  # tumble wrt rbm
+
+            # CAN YOU ADD THE RBM AND TUMBLE ANGLES TO GET THE RESULTANT ANGLE? IS IT THAT SIMPLE?
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
+            print(rbm_angle, angle, angle-rbm_angle)
 
+        angle=rbm_angle
         
         # Append data to lists
         self.brownian_history.append(np.copy(self.brownian_position))  # TBM
