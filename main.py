@@ -78,7 +78,7 @@ plt.close()
 
 # Create list of cell trajectories (this loop might not be needed, e.g. make
 # everything a numpy array and do away with python lists)
-print('Extracting model data...')
+print('Extracting data from model...')
 brownian_positions = []
 positions = []
 rbm_angles= []
@@ -109,8 +109,14 @@ r = np.linalg.norm(positions,axis=2)[0]
 theta = angles[0,:]   # incorrect theta
 print('Done')
 
+# Save model swimming data to file
+model_filename="model_{:03d}s.txt".format(np.max(System.max_time))
+print('Saving model data to {}...'.format(model_filename))
+IO.save_model(model_filename,[System.timesteps,x,y,z],["%4.2f","%16.8f","%16.8f","%16.8f"])
+print('Done')
+
 # EXPERIMENT DATA
-print('Loading experimental data...')
+print('Loading experimental data from file...')
 t_track, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
 xt = pos_track[:,0]
 yt = pos_track[:,1]
