@@ -201,8 +201,9 @@ fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title_d, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # r
 fg.scatter([tau_values,msq_thetab],
-        ["$\\tau$ (s)","$\langle \\theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
-        title_dr, tag='bm_', fit=False, fitdata=[tau_values,fit_th])  # theta
+        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_Theta',
+        title_dr, tag='bm_', fit=True, fitdata=[tau_values,fit_th],
+        fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$")  # Theta
 
 # model
 fg.scatter([tau_values,msq_x],
@@ -219,7 +220,7 @@ fg.scatter([tau_values,msq_r],
         'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
 fg.scatter([tau_values,msq_theta],
         ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_Theta',
-        title_dr, tag='model_', fit=False, fitdata=[tau_values,fit_th])  # theta
+        title_dr, tag='model_', fit=False)  # Theta
 
 
 # PROBABILITY DISTRIBUTIONS
@@ -233,7 +234,7 @@ fit_p=ss.norm.pdf(fit_r,0,np.sqrt(6*System.diffusion_constant*System.time_step))
 fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_p_tau1',title_d,tag='bm_',fit=True,fitdata=[fit_r,fit_p],
     fitlabel=r"$P(r,t)=\frac{1}{\sqrt{12\pi D\Delta t}}\exp\left[{\frac{-r^2}{12D\Delta t}}\right]$")  # r
 
-fit_th=np.linspace(-15,-15,num=1000)
+fit_th=np.linspace(-15,15,num=1000)
 fit_p=ss.norm.pdf(fit_th,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
 fg.distribution(np.rad2deg(thetab_tau[0]),'$\\Theta(\\tau=1)$ $(deg)$','Theta_VS_p_tau1',title_dr, 
     tag='bm_',fit=True, fitdata=[fit_th,fit_p],
