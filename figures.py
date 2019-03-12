@@ -27,7 +27,7 @@ class FigureTemplate(mpl.figure.Figure):
 
 
 def scatter(data, axis_labels, dataname, title, tag="", final=True, 
-            regress=False, fit=False, fitdata=[[0],[0]]):
+            regress=False, fit=False, fitdata=[[0],[0]], fitlabel="Fit"):
     """2D scatter plot. Input lists taken in as [x,y]."""
 
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
@@ -53,16 +53,17 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         slope = reg_data[0]
         yint = reg_data[1]
         plt.text(0.01,0.95,'Y = {:.4}X + {:.4}'.format(slope,yint), 
-                transform = ax.transAxes, color='red')
+                transform = ax.transAxes, color='red', label=fitlabel)
         figname += '_linreg'
 
     # optional line fitting
     if fit==True:
         xfit = fitdata[0]
         yfit = fitdata[1]
-        plt.plot(xfit,yfit,'r--',lw=1)
+        plt.plot(xfit,yfit,'r--',lw=1,label=fitlabel)
         figname += '_fitted'
 
+    plt.legend()
     plt.tight_layout()
 
     if final==True:
@@ -70,8 +71,11 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         plt.close()
 
 
-def distribution(xdata, xlabel, dataname, title, tag="", fit=False, fitdata=[[0],[0]]):
-    """Probability distribution of a 1D dataset"""
+def distribution(xdata, xlabel, dataname, title, tag="_", fit=False, fitdata=[[0],[0]], fitlabel="Fit"):
+    """
+    Probability distribution of a 1D dataset
+    """
+
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
     figname = 'distribution_'+dataname
 
@@ -84,10 +88,11 @@ def distribution(xdata, xlabel, dataname, title, tag="", fit=False, fitdata=[[0]
     if fit:
         xfit = fitdata[0]
         yfit = fitdata[1]
-        plt.plot(xfit,yfit,'r-',lw=1)
+        plt.plot(xfit,yfit,'r-',lw=1,label=fitlabel)
         figname += '_fitted'
 
     plt.tight_layout()
+    plt.legend()
     plt.savefig(folder+tag+figname+'.png',dpi=400)
     plt.close()
 
