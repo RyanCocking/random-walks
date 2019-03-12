@@ -163,24 +163,22 @@ class Cell3D:
         self.rot_brownian_motion(rot_diffusion_constant, time_step)
 
         # Compute angle of rotation
-        rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # rbm wrt original
+        rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM
+        angle = rbm_angle
 
         # Perform tumble if dice roll successful
         if np.random.random() < self.tumble_chance:
-            self.tumble(np.deg2rad(68),0.25*np.pi)
-            angle = np.arccos(np.dot(old_direction,self.direction))  # tumble wrt rbm
-
-            # CAN YOU ADD THE RBM AND TUMBLE ANGLES TO GET THE RESULTANT ANGLE? IS IT THAT SIMPLE?
+            self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
+            angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM and tumble
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
-            print(rbm_angle, angle, angle-rbm_angle)
 
-        angle=rbm_angle
-        
+        print(rbm_angle, angle)
+
         # Append data to lists
         self.brownian_history.append(np.copy(self.brownian_position))  # TBM
         self.swim_history.append(np.copy(self.swim_position))  # Runs
-        self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # Runs and TBM
+        self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # TBM and runs
         self.rbm_angle_history.append(rbm_angle)  # RBM
         self.angle_history.append(angle)  # RBM and tumbles
