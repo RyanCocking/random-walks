@@ -205,7 +205,7 @@ fg.scatter([tau_values,msq_thetab],
         title_dr, tag='bm_', fit=False, fitdata=[tau_values,fit_th])  # theta
 
 # model
-fg.scatter([tau_values,msq_x], 
+fg.scatter([tau_values,msq_x],
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_x', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # x
 fg.scatter([tau_values,msq_y],
@@ -219,7 +219,7 @@ fg.scatter([tau_values,msq_r],
         'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
 fg.scatter([tau_values,msq_theta],
         ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_Theta',
-        title_dr, tag='model_', fit=False, fitdata=[tau_values,fit_theta])  # theta
+        title_dr, tag='model_', fit=False, fitdata=[tau_values,fit_th])  # theta
 
 
 # PROBABILITY DISTRIBUTIONS
