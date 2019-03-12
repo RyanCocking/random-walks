@@ -9,7 +9,7 @@ class System:
     # System parameters
     box_size = 1000    # mu_m
     cell_radius = 1.0  # mu_m
-    temperature = 300  # K
+    temperature = 300.0  # K
     viscosity = 0.01  # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     
     # Diffusion constants (Stokes-Einstein relation)
@@ -18,7 +18,7 @@ class System:
     rot_diffusion_constant = (boltz*temperature)/(8.0*np.pi*0.1*viscosity*(1e-6*cell_radius)**3)  # rad^2/s
 
     # Time
-    max_time = 34     # s
+    max_time = 34.0     # s
     time_step = 0.02  # s
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -28,5 +28,10 @@ class System:
     np.random.seed(seed)
 
     # Graph header
-    title = "Time = {}s, step size = {}s, seed = {}".format(max_time, time_step, seed)
+    title = "Time = {}s, step = {}s, seed = {}".format(max_time, time_step, seed)
+
+    # Parameter string
+    paramstring = "T={0:5.1} K, eta={1:5.3} g/cm s, D={2:6.4} mu^2/s, D_r={3:6.4} rad^2/s, \
+    tmax={4:3.1f} s, dt={5:5.3f} s, seed={6:2d}".format(temperature, viscosity, diffusion_constant, \
+    rot_diffusion_constant, max_time, time_step, seed)
 
