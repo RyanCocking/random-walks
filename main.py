@@ -72,29 +72,33 @@ print('Done')
 #-------------------------------DATA EXTRACTION------------------------------#
 #----------------------------------------------------------------------------#
 
-print('Extracting model data...')
 
 # Create list of cell trajectories (this loop might not be needed, e.g. make
 # everything a numpy array and do away with python lists)
+print('Extracting model data...')
 brownian_positions = []
 positions = []
+rbm_angles= []
 angles = []
 for swimmer in swimmers:
-    brownian_positions.append(np.array(swimmer.brownian_history))
-    positions.append(np.array(swimmer.combined_history))  # swim_history (pure r&t), combined_history (r&t + TBM)
-    angles.append(np.array(swimmer.rbm_angle_history))
+    brownian_positions.append(np.array(swimmer.brownian_history))  # TBM
+    positions.append(np.array(swimmer.combined_history))  # TBM and R&T
+    rbm_angles.append(np.array(swimmer.rbm_angle_history))  # RBM
+    angles.append(np.array(swimmer.angle_history))  # RBM and tumbles
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
+rbm_angles = np.array(rbm_angles)
 angles = np.array(angles)
 
-# Model data
+# MODEL DATA
 # brownian
 xb = brownian_positions[0,:,0]
 yb = brownian_positions[0,:,1]
 zb = brownian_positions[0,:,2]
 rb = np.linalg.norm(brownian_positions,axis=2)[0]
-# swimming
+thetab = rbm_angles[0,:]
+# swimming & brownian
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
@@ -102,7 +106,7 @@ r = np.linalg.norm(positions,axis=2)[0]
 theta = angles[0,:]
 print('Done')
 
-# Tracking data
+# EXPERIMENT DATA
 print('Loading experimental data...')
 t_track, pos_track, pos_s_track = IO.load_track('tracks/track34sm.txt')
 xt = pos_track[:,0]
@@ -118,11 +122,11 @@ tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
 
-datasets = [x,y,z,r,theta,xb,yb,zb,rb]
+datasets = [x,y,z,r,theta,xb,yb,zb,rb,thetab]
 data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
     System.time_step)
 
-# swimming data
+# swimming & brownian
 #x_tau = data_tau[0]
 #y_tau = data_tau[1]
 #z_tau = data_tau[2]
@@ -137,7 +141,7 @@ msq_z  = msq[2]
 msq_r  = msq[3]
 msq_theta = msq[4]
 
-# brownian data
+# brownian
 xb_tau = data_tau[5]
 yb_tau = data_tau[6]
 zb_tau = data_tau[7]
@@ -150,6 +154,7 @@ msq_xb  = msq[5]
 msq_yb  = msq[6]
 msq_zb  = msq[7]
 msq_rb  = msq[8]
+msq_thetab = msq[9]
 print('Done')
 
 #----------------------------------------------------------------------------#
@@ -158,45 +163,44 @@ print('Done')
 
 print('Plotting graphs...')
 
-# Trajectory plots (model)
-fg.trajectory(positions[0], System.box_size, System.title, tag='model_')
-fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')
+# TRAJECTORIES
+# model
+fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
+fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
 
-# Trajectory plots (experiment)
+# experiment
 fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
 fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
 fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
 fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
 
-# tau vs. mean square plots
+# TAU VS. MEAN SQUARE SCATTER PLOTS
+# brownian
 fit_xyz = 2*System.diffusion_constant*tau_values
 fit_r = 6*System.diffusion_constant*tau_values
 fg.scatter([tau_values,msq_xb], 
         ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # brownian x
+        'tau_VS_msq_x', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # x
 fg.scatter([tau_values,msq_yb],
         ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # brownian y
+        'tau_VS_msq_y', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # y
 fg.scatter([tau_values,msq_zb],
         ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # brownian z
+        'tau_VS_msq_z', System.title,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # z
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_r', System.title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # brownian r
-fg.scatter([tau_values,msq_theta],
-        ["$\\tau$ (s)","$\langle \theta^2_{\\tau} \\rangle$ $(rad^2)$"],
-        'tau_VS_msq_theta', System.title, tag='model_', fit=False)  # angular deviation
+        'tau_VS_msq_r', System.title, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # r
+fg.scatter([tau_values,msq_thetab],
+        ["$\\tau$ (s)","$\langle \theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
+        System.title, tag='model_', fit=False)  # theta
 
-
-# histograms
-fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',System.title,tag='bm_')
-fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',System.title,tag='bm_')
-fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',System.title,tag='bm_')
-
-x=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
-fit=ss.norm.pdf(x,0,np.sqrt(2*System.diffusion_constant*System.time_step))
-fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_',fit=True,fitdata=[x,fit])
-
-# run durations
+# PROBABILITY DISTRIBUTIONS
+# brownian
+fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_px_tau1',System.title,tag='bm_')  # x
+fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_py_tau1',System.title,tag='bm_')  # y
+fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_pz_tau1',System.title,tag='bm_')  # z
+rfit=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
+pfit=ss.norm.pdf(rfit,0,np.sqrt(2*System.diffusion_constant*System.time_step))
+fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_pr_tau1',System.title,tag='bm_',fit=True,fitdata=[rfit,pfit])  # r
 
 print('Done')
