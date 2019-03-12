@@ -108,7 +108,7 @@ print('Done')
 
 # EXPERIMENT DATA
 print('Loading experimental data...')
-t_track, pos_track, pos_s_track = IO.load_track('tracks/track34sm.txt')
+t_track, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
 xt = pos_track[:,0]
 yt = pos_track[:,1]
 zt = pos_track[:,2]
