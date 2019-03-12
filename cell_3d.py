@@ -71,8 +71,8 @@ class Cell3D:
         self.brownian_history.append(np.copy(self.brownian_position))  # translational brownian motion
         self.combined_history = []
         self.combined_history.append(np.copy(self.swim_position)+np.copy(self.brownian_position))
-        self.rbm_angle_history = [0.0]  # angular deviation (between subsequent time steps)
-        self.angle_history = [0.0]  # angular deviation (between subsequent time steps)
+        self.rbm_angle_history = [0.0]  # angular deviation due to rotational brownian motion
+        self.angle_history = [0.0]  # ang. dev. due to both RBM and tumbles
         self.run_durations = []
         self.tumble_angles = []
 
@@ -173,8 +173,6 @@ class Cell3D:
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
-
-        print(rbm_angle, angle)
 
         # Append data to lists
         self.brownian_history.append(np.copy(self.brownian_position))  # TBM
