@@ -85,3 +85,16 @@ class Data:
             angles[i] = np.arccos(np.dot(r1,r2)/(mag_r1*mag_r2))
             
         return angles
+
+    def angular_correlation(rhat):
+        """
+        Given an array of direction unit vectors, compute the angular
+        correlation function for a number of delay times. Over an
+        entire simulation the function should have the form:
+        
+        .. math::
+            <\hat{r}(\tau)\cdot\hat{r}(0)>=e^{-2D_r\tau}
+        """
+
+        
+        
