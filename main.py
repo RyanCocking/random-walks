@@ -18,19 +18,13 @@ import figures as fg
 swimmers = []
 for i in range(1):
     swimmers.append(Cell3D(name='Escherichia coli', 
-        position=np.array([0.0,0.0,0.0]), speed=20, 
-        direction=np.array([1.0,0.0,0.0]), tumble_chance=0.05, 
+        position=np.array([0.0,0.0,0.0]), speed=System.mean_speed, 
+        direction=np.array([1.0,0.0,0.0]), tumble_chance=System.tumble_prob, 
         time_step=System.time_step))
 
 # Print simulation parameters at start
-cell=swimmers[0]
-print("Simulating {0:1d} cell of {1:s}".format(len(swimmers),cell.name))
-print("mean velocity = {0:4.1f} micron/s ; tumble probability per timestep = {1:4.2f}".format( \
-    cell.speed, cell.tumble_chance))
-print("max time = {0:4.1f} s; step = {1:6.3f} s".format(System.max_time,System.time_step))
-print("temperature = {0:5.1f} K ; viscosity = {1:5.3f} g/cm s".format(System.temperature,System.viscosity))
-print("diffusion coefficient = {0:6.4f} micron^2/s ; rotational diffusion coefficient = {1:6.4f} rad^2/s".format( \
-    System.diffusion_constant,System.rot_diffusion_constant))
+print("Simulating {0:1d} cell of {1:s}".format(len(swimmers),swimmers[0].name))
+print(System.paramstring)
 
 # Step through time in range 1 <= t <= tmax
 print('Computing cell trajectories...')
@@ -79,9 +73,8 @@ plt.savefig('angle.png',dpi=400)
 plt.close()
 
 #----------------------------------------------------------------------------#
-#-------------------------------DATA EXTRACTION------------------------------#
+#---------------------------------TRAJECTORIES-------------------------------#
 #----------------------------------------------------------------------------#
-
 
 # Create list of cell trajectories (this loop might not be needed, e.g. make
 # everything a numpy array and do away with python lists)
@@ -118,12 +111,13 @@ print('Done')
 
 # Save model swimming data to file
 model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))
-print('Saving model data to {}...'.format(model_filename))
-IO.save_model(model_filename,[System.timesteps,x,y,z],["%4.2f","%16.8f","%16.8f","%16.8f"],System.paramstring)
+print('Saving model trajectory to {}...'.format(model_filename))
+IO.save_model(model_filename,[System.timesteps,x,y,z],["%.2f","%.5e","%.5e","%.5e"],
+    System.paramstring)
 print('Done')
 
 # EXPERIMENT DATA
-print('Loading experimental data from file...')
+print('Loading experimental trajectory from file...')
 t_track, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
 xt = pos_track[:,0]
 yt = pos_track[:,1]
@@ -132,8 +126,28 @@ rt  = np.linalg.norm(pos_track,axis=1)
 rt_s = np.linalg.norm(pos_s_track,axis=1)
 print('Done')
 
-# Delay time averaging (model)
-print('Averaging data...')
+
+# TRAJECTORIES
+print('Plotting trajectories...')
+# model
+fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
+fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
+
+# experiment
+fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
+fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
+fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
+fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
+print('Done')
+
+#----------------------------------------------------------------------------#
+#-----------------------------------ANALYSIS---------------------------------#
+#----------------------------------------------------------------------------#
+
+quit()
+
+# Delay-time averaging
+print('Delay-time averaging data...')
 tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
@@ -174,24 +188,8 @@ msq_rb  = msq[8]
 msq_thetab = msq[9]
 print('Done')
 
-#----------------------------------------------------------------------------#
-#-----------------------------------PLOTTING---------------------------------#
-#----------------------------------------------------------------------------#
-
-print('Plotting graphs...')
-
-# TRAJECTORIES
-# model
-fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
-fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
-
-# experiment
-fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
-fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
-fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
-fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
-
 # TAU VS. MEAN SQUARE SCATTER PLOTS
+print('Plotting graphs...')
 title_d=System.title+", $D={:6.4f}\mu m^2$".format(System.diffusion_constant)
 title_d+="$s^{-1}$"
 title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
