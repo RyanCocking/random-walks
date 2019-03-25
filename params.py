@@ -11,7 +11,7 @@ class System:
     temperature = 300.0  # K
     viscosity = 0.01  # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     cell_radius = 1.0  # mu
-    tumble_prob = 0.05  # per timestep
+    tumble_prob = 0.00  # per timestep
     mean_speed = 20  # mu/s
 
     # Diffusion constants (Stokes-Einstein relation)
@@ -20,7 +20,7 @@ class System:
     rot_diffusion_constant = (boltz*temperature)/(8.0*np.pi*0.1*viscosity*(1e-6*cell_radius)**3)  # rad^2/s
 
     # Time
-    max_time = 100.0     # s
+    max_time = 200.0     # s
     time_step = 0.02  # s
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
