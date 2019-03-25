@@ -39,5 +39,5 @@ class IO:
         """
 
         np.savetxt(fname=filename, X=np.transpose(data_list),
-            fmt=format_list, delimiter="    ",header=title)
+            fmt=format_list, delimiter="\t",header=title)
 

@@ -146,14 +146,13 @@ plt.legend()
 plt.savefig('log.png',dpi=400)
 plt.close()
 
-quit()
 # ===============
 
 
 # Save model swimming data to file
 model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))
 print('Saving model trajectory to {}...'.format(model_filename))
-IO.save_model(model_filename,[System.timesteps,x,y,z],["%.2f","%.5e","%.5e","%.5e"],
+IO.save_model(model_filename,[System.timesteps,x,y,z],["%.2f","%.6e","%.6e","%.6e"],
     System.paramstring)
 print('Done')
 
@@ -167,6 +166,7 @@ rt  = np.linalg.norm(pos_track,axis=1)
 rt_s = np.linalg.norm(pos_s_track,axis=1)
 print('Done')
 
+quit()
 
 # TRAJECTORIES
 print('Plotting trajectories...')
