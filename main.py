@@ -119,7 +119,6 @@ print("Done")
 
 tfit = t1
 cfit = np.exp(-2.0*System.rot_diffusion_constant*tfit)
-c2fit = np.exp(-4.0*System.rot_diffusion_constant*tfit) 
 chfit = np.exp(-System.rot_diffusion_constant*tfit)
 corr2 = np.where(corr1<=0,1e-5,corr1)
 
@@ -128,7 +127,6 @@ print(cfit[11])
 
 plt.plot([1.0/(2*System.rot_diffusion_constant),1.0/(2*System.rot_diffusion_constant)],[1.0,-0.5],color='k',ls='--',lw=1,label="$\\tau = 1/2D_r$")
 plt.plot(tfit,cfit,color='r',label="exp($-2D_r\\tau$)")
-plt.plot(tfit,c2fit,color='g',label="exp($-4D_r\\tau$)")
 plt.plot(tfit,chfit,color='b',label="exp($-D_r\\tau$)")
 plt.plot(t1,corr1,'k+',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
 plt.xscale('log')
@@ -139,8 +137,8 @@ plt.legend()
 plt.savefig('corrtest.png',dpi=400)
 plt.close()
 
+plt.plot([1.0/(2*System.rot_diffusion_constant),1.0/(2*System.rot_diffusion_constant)],[1.0,-0.5],color='k',ls='--',lw=1,label="$\\tau = 1/2D_r$")
 plt.plot(tfit,np.where(cfit<=1e-5,1e-5,cfit),color='r',label="exp($-2D_r\\tau$)")
-plt.plot(tfit,np.where(c2fit<=1e-5,1e-5,c2fit),color='g',label="exp($-4D_r\\tau$)")
 plt.plot(tfit,np.where(chfit<=1e-5,1e-5,chfit),color='b',label="exp($-D_r\\tau$)")
 plt.plot(t1,corr2,'k+',ms=1,label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
 plt.xlabel("$\\tau$ (s)")
