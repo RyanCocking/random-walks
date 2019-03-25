@@ -169,7 +169,7 @@ class Cell3D:
         # Perform tumble if dice roll successful
         if np.random.random() < self.tumble_chance:
             self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
-            angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM and tumble
+            angle = np.arccos(np.dot(old_direction,self.direction))  # Angle due to RBM and tumble
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Data:
 
     def mean_square(data, axis=0):
@@ -71,7 +72,7 @@ class Data:
         dot product between the two displacement vectors produced by
         groups of three points, to produce a N-2 array of angles.
         
-        coords is a 3*N array; an array with each of N elements 
+        coords is a 3*N array; an array with each element 
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
         """
 
@@ -86,7 +87,7 @@ class Data:
             
         return angles
 
-    def angular_correlation(rhat):
+    def angular_correlation(rhat, step_size):
         """
         Given an array of direction unit vectors, compute the angular
         correlation function for a number of delay times. Over an
@@ -96,5 +97,26 @@ class Data:
             <\hat{r}(\tau)\cdot\hat{r}(0)>=e^{-2D_r\tau}
         """
 
+        N = np.shape(rhat)[0]
+
+        corr = []
+        time = []
+        diff = []
+
+        for segment in range(1,N):
+            samples = N - segment      # 1 <= samples < N
+            tau = step_size * segment  # seconds
+            corrsum = 0
+            for i in range(0,samples):
+                corrsum += np.dot(rhat[i],rhat[i+segment])
+
+            mean = corrsum / samples       # angular correlation
+            D_r = -np.log(mean)/(2.0*tau)  # rot diff const
+            
+            time.append(tau)
+            corr.append(mean)            
+            diff.append(D_r)
+
+        return np.array(time), np.array(corr), np.array(diff)
         
         
