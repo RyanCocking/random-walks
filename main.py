@@ -81,16 +81,19 @@ brownian_positions = []
 positions = []
 rbm_angles= []
 angles = []
+directions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))  # TBM
     positions.append(np.array(swimmer.combined_history))  # TBM and R&T
     rbm_angles.append(np.array(swimmer.rbm_angle_history))  # RBM
     angles.append(np.array(swimmer.angle_history))  # RBM and tumbles
+    directions.append(np.array(swimmer.direction_history))
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
 rbm_angles = np.array(rbm_angles)
 angles = np.array(angles)
+directions = np.array(directions)
 
 # MODEL DATA
 # brownian
@@ -105,7 +108,30 @@ y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.linalg.norm(positions,axis=2)[0]
 theta = angles[0,:]   # incorrect theta
+rhat = directions[0,:]
 print('Done')
+
+# ANGULAR CORRELATION TEST
+print("Computing angular correlation...")
+t1, corr1 = Data.ang_corr(rhat,System.time_step)
+print("Done")
+
+
+tfit = System.timesteps[1:]
+cfit = np.exp(-2.0*tfit)
+
+
+plt.plot(t1,corr1,'r+',ms=1)
+plt.plot(tfit,cfit,color='k')
+plt.xscale('log')
+plt.xlabel("$\\tau$ (s)$")
+plt.ylabel("$\langle \hat{r}(\\tau) \hat{r}(0)  \\rangle$")
+plt.savefig('corrtest.png')
+plt.close()
+
+quit()
+# ===============
+
 
 # Save model swimming data to file
 model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))

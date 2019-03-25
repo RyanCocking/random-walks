@@ -87,11 +87,11 @@ class Data:
             
         return angles
 
-    def angular_correlation(rhat, step_size):
+    def ang_corr(rhat, step_size):
         """
-        Given an array of direction unit vectors, compute the angular
-        correlation function for a number of delay times. Over an
-        entire simulation the function should have the form:
+        Given an array of N direction unit vectors, compute the angular
+        correlation function for N-1 delay times. Over an entire simulation 
+        the function should have the form:
         
         .. math::
             <\hat{r}(\tau)\cdot\hat{r}(0)>=e^{-2D_r\tau}
@@ -101,7 +101,7 @@ class Data:
 
         corr = []
         time = []
-        diff = []
+        #diff = []
 
         for segment in range(1,N):
             samples = N - segment      # 1 <= samples < N
@@ -111,12 +111,12 @@ class Data:
                 corrsum += np.dot(rhat[i],rhat[i+segment])
 
             mean = corrsum / samples       # angular correlation
-            D_r = -np.log(mean)/(2.0*tau)  # rot diff const
+            #D_r = -np.log(mean)/(2.0*tau)  # rot diff const (can cause NaN)
             
             time.append(tau)
             corr.append(mean)            
-            diff.append(D_r)
+            #diff.append(D_r)
 
-        return np.array(time), np.array(corr), np.array(diff)
+        return np.array(time), np.array(corr)
         
         
