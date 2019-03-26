@@ -90,8 +90,9 @@ class Data:
     def ang_corr(rhat, step_size):
         """
         Given an array of N direction unit vectors, compute the angular
-        correlation function for N-1 delay times. Over an entire simulation 
-        the function should have the form:
+        correlation function for N-1 delay times (excludes tau=0).
+        
+        Over an entire simulation the function should have the form:
         
         .. math::
             <\hat{r}(\tau)\cdot\hat{r}(0)>=e^{-2D_r\tau}
