@@ -63,10 +63,9 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         plt.plot(xfit,yfit,'r--',lw=1,label=fitlabel)
         figname += '_fitted'
 
-    plt.legend()
-    plt.tight_layout()
-
     if final==True:
+        plt.legend()
+        plt.tight_layout()
         plt.savefig(folder+tag+figname+'.png',dpi=400)
         plt.close()
 
