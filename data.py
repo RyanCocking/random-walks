@@ -99,24 +99,19 @@ class Data:
 
         N = np.shape(rhat)[0]
 
-        corr = []
-        time = []
-        #diff = []
+        delay_time = np.zeros(N-1)
+        corr = np.copy(delay_time)
 
-        for segment in range(1,N):
+        for i,segment in enumerate(range(1,N), 0):
+            corrsum = 0
             samples = N - segment      # 1 <= samples < N
             tau = step_size * segment  # seconds
-            corrsum = 0
-            for i in range(0,samples):
-                corrsum += np.dot(rhat[i],rhat[i+segment])
+            for j in range(0,samples):
+                corrsum += np.dot(rhat[j], rhat[j+segment])
 
-            mean = corrsum / samples       # angular correlation
-            #D_r = -np.log(mean)/(2.0*tau)  # rot diff const (can cause NaN)
-            
-            time.append(tau)
-            corr.append(mean)            
-            #diff.append(D_r)
+            delay_time[i] = tau
+            corr[i] = corrsum / samples
 
-        return np.array(time), np.array(corr)
+        return delay_time, corr
         
         
