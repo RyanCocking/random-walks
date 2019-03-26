@@ -32,7 +32,7 @@ for time in System.timesteps[1:]:
     # Update every cell
     for swimmer in swimmers:
         swimmer.update(System.diffusion_constant, System.rot_diffusion_constant,
-                       System.time_step, 2*np.pi)
+                       System.time_step)
 
 print('Done')
 

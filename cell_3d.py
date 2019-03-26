@@ -60,7 +60,7 @@ class Cell3D:
         self.swim_position = position
         self.brownian_position = np.copy(position)
         self.speed = speed
-        self.direction = direction
+        self.direction = direction  # direction unit vector, rhat
         self.velocity = self.speed * self.direction
         self.tumble_chance = tumble_chance  # probability per time step
         self.run_duration = 0
@@ -75,6 +75,8 @@ class Cell3D:
         self.angle_history = [0.0]  # ang. dev. due to both RBM and tumbles
         self.run_durations = []
         self.tumble_angles = []
+        self.direction_history = []
+        self.direction_history.append(np.copy(self.direction))
 
 
     def run(self, time_step):
@@ -136,8 +138,7 @@ class Cell3D:
         self.direction = rotate(self.direction,dtheta,dphi)
 
 
-    def update(self, diffusion_constant, rot_diffusion_constant, time_step,
-               max_tumble_angle):
+    def update(self, diffusion_constant, rot_diffusion_constant, time_step):
         """Called once per time step:
              1) Record the original direction in which the cell is facing.
              2) Perform a run in this direction and increment the run duration.
@@ -180,3 +181,4 @@ class Cell3D:
         self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # TBM and runs
         self.rbm_angle_history.append(rbm_angle)  # RBM
         self.angle_history.append(angle)  # RBM and tumbles
+        self.direction_history.append(np.copy(self.direction))  # rhat
