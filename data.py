@@ -70,7 +70,7 @@ class Data:
         """
         For a cell trajectory of N coordinates (x,y,z), compute the
         dot product between the two displacement vectors produced by
-        groups of three points, to produce a N-2 array of angles.
+        groups of three points, to produce an N-2 array of angles.
         
         coords is a 3*N array; an array with each element 
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
@@ -114,5 +114,3 @@ class Data:
             corr[i] = corrsum / samples
 
         return delay_time, corr
-        
-        

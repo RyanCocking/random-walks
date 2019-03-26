@@ -31,6 +31,8 @@ def rotate(rhat,theta,phi):
     order). Inverse-transform the vector back to its original position. 
     Spherical polar coordinates are used here (rhat, theta, phi), with 
     anticlockwise rotations.
+    
+    Transformations are performed on the unit vector, u (a copy of rhat).
     """
     
     # Initial polar (alpha) and azimuthal (beta) angles of unit vector rhat
@@ -39,18 +41,19 @@ def rotate(rhat,theta,phi):
     beta=np.arctan(rhat[1]/rhat[0])
         
     # Align to z-axis
-    rhat=np.matmul(Rz(-beta),rhat)
-    rhat=np.matmul(Ry(-alpha),rhat)
+    u=np.copy(rhat)
+    u=np.matmul(Rz(-beta),u)
+    u=np.matmul(Ry(-alpha),u)
     
     # Rotate relative to transformed frame of reference
-    rhat=np.matmul(Ry(theta),rhat)
-    rhat=np.matmul(Rz(phi),rhat)
+    u=np.matmul(Ry(theta),u)
+    u=np.matmul(Rz(phi),u)
     
     # Return to original frame
-    rhat=np.matmul(Ry(alpha),rhat)
-    rhat=np.matmul(Rz(beta),rhat)
+    u=np.matmul(Ry(alpha),u)
+    u=np.matmul(Rz(beta),u)
     
-    return rhat
+    return u
 
 class Cell3D:
 
@@ -87,30 +90,34 @@ class Cell3D:
 
     def tumble(self, tumble_mean, tumble_stddev):
         """
-        Perform a tumble on the unit direction vector of the cell. Tumble
-        angle (theta) is drawn from a normal distribution defined by the input
-        arguments. Following a rotation by theta, the vector is revolved
-        through an angle phi, drawn from a uniform random distribution within
-        the range 0 <= phi < 2pi radians.
+        Perform a tumble on the direction unit vector of the cell. Tumble
+        angle (theta_t) is drawn from a normal distribution defined by the input
+        arguments. 
+        
+        Following a rotation by theta_t, the unit vector is revolved into 3D
+        space through an angle phi, drawn from a uniform random distribution
+        such that 0 <= phi < 2pi radians.
 
         Experimental data for E.coli suggests tumbles are biased in the forward
         direction, with a mean tumble angle of ~68 degrees [HC Berg, Random Walks
         in Biology, p86; 1993].
         """
 
-        tumble_angle = np.random.normal(tumble_mean,tumble_stddev)
-        rev_angle = np.random.uniform(0,2.0*np.pi)
-        self.direction = rotate(np.copy(self.direction),tumble_angle,rev_angle)
+        theta_t = np.random.normal(loc=tumble_mean, scale=tumble_stddev, size=None)
+        phi = np.random.uniform(0, 2.0*np.pi)
+        self.direction = rotate(self.direction, theta_t, phi)
 
 
-    def draw_brownian_step(D, dt):
+    def draw_brownian_step(dim, D, dt):
         """
         Return a value drawn from a normal distribution centred at zero,
-        with variance proportional to 2*D*dt. D is the diffusion coefficient
-        of translational or rotational Brownian motion.
+        with variance proportional to dim*2*D*dt. dim is an integer that
+        corresponds to the number of axes contributing to the step (1, 2 or 3).
+        D is the diffusion coefficient of translational or rotational Brownian
+        motion.
         """
 
-        return np.random.normal(0,np.sqrt(2*D*dt))
+        return np.random.normal(loc=0, scale=np.sqrt(dim*2.0*D*dt), size=None)
 
 
     def trans_brownian_motion(self, diffusion_constant, time_step):
@@ -121,21 +128,31 @@ class Cell3D:
         """
 
         # independent steps in x, y and z
-        dx = Cell3D.draw_brownian_step(diffusion_constant, time_step)
-        dy = Cell3D.draw_brownian_step(diffusion_constant, time_step)
-        dz = Cell3D.draw_brownian_step(diffusion_constant, time_step)
+        dx = Cell3D.draw_brownian_step(1, diffusion_constant, time_step)
+        dy = Cell3D.draw_brownian_step(1, diffusion_constant, time_step)
+        dz = Cell3D.draw_brownian_step(1, diffusion_constant, time_step)
 
         self.brownian_position += np.array([dx,dy,dz])
 
 
     def rot_brownian_motion(self, rot_diffusion_constant, time_step):
-        """Under construction."""
+        """
+        Deviate by some angle, theta_rbm, according to rotational Brownian
+        motion, relative to the direction unit vector of the cell. 
+        
+        theta_rbm is drawn from a normal distribution centred at zero with a
+        variance proportional to 4*D_r*dt, where D_r is the rotational diffusion
+        constant and dt is the simulation time step. 
+        
+        Following a rotation by theta_rbm, the unit vector is revolved into 3D
+        space through an angle phi, drawn from a uniform random distribution
+        such that 0 <= phi < 2pi radians.
+        """
 
-        # independent rotations in theta and phi
-        dtheta = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
-        dphi = Cell3D.draw_brownian_step(rot_diffusion_constant, time_step)
+        theta_rbm = Cell3D.draw_brownian_step(2, rot_diffusion_constant, time_step)
+        phi = np.random.uniform(0, 2.0*np.pi)
 
-        self.direction = rotate(self.direction,dtheta,dphi)
+        self.direction = rotate(self.direction, theta_rbm, phi)
 
 
     def update(self, diffusion_constant, rot_diffusion_constant, time_step):
@@ -156,8 +173,8 @@ class Cell3D:
                      zero ('end' the current run).
              7) Append data to lists and exit.
         """
-
-        old_direction = self.direction
+        
+        old_direction = np.copy(self.direction)
 
         self.run(time_step)
         self.trans_brownian_motion(diffusion_constant, time_step)        
