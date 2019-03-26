@@ -100,7 +100,7 @@ class Cell3D:
 
         tumble_angle = np.random.normal(tumble_mean,tumble_stddev)
         rev_angle = np.random.uniform(0,2.0*np.pi)
-        self.direction = rotate(self.direction,tumble_angle,rev_angle)
+        self.direction = rotate(np.copy(self.direction),tumble_angle,rev_angle)
 
 
     def draw_brownian_step(D, dt):
