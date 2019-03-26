@@ -111,48 +111,7 @@ theta = angles[0,:]   # incorrect theta
 rhat = directions[0,:]
 print('Done')
 
-# ANGULAR CORRELATION TEST
-print("Computing angular correlation...")
-t1, corr1 = Data.ang_corr(rhat,System.time_step)
-print("Done")
-
-
-tfit = t1
-cfit = np.exp(-2.0*System.rot_diffusion_constant*tfit)
-chfit = np.exp(-System.rot_diffusion_constant*tfit)
-corr2 = np.where(corr1<=0,1e-5,corr1)
-
-print(t1[11])
-print(cfit[11])
-
-plt.plot([1.0/(2*System.rot_diffusion_constant),1.0/(2*System.rot_diffusion_constant)],[1.0,-0.5],color='k',ls='--',lw=1,label="$\\tau = 1/2D_r$")
-plt.plot(tfit,cfit,color='r',label="exp($-2D_r\\tau$)")
-plt.plot(tfit,chfit,color='b',label="exp($-D_r\\tau$)")
-plt.plot(t1,corr1,'k+',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
-plt.xscale('log')
-plt.xlabel("$\\tau$ (s)")
-plt.ylim(-0.2,1.0)
-plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
-plt.legend()
-plt.savefig('corrtest.png',dpi=400)
-plt.close()
-
-plt.plot([1.0/(2*System.rot_diffusion_constant),1.0/(2*System.rot_diffusion_constant)],[1.0,-0.5],color='k',ls='--',lw=1,label="$\\tau = 1/2D_r$")
-plt.plot(tfit,np.where(cfit<=1e-5,1e-5,cfit),color='r',label="exp($-2D_r\\tau$)")
-plt.plot(tfit,np.where(chfit<=1e-5,1e-5,chfit),color='b',label="exp($-D_r\\tau$)")
-plt.plot(t1,corr2,'k+',ms=1,label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
-plt.xlabel("$\\tau$ (s)")
-plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
-plt.xlim(0,20)
-plt.yscale('log')
-plt.legend()
-plt.savefig('log.png',dpi=400)
-plt.close()
-
-# ===============
-
-
-# Save model swimming data to file
+# Save trajectory to file
 model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))
 print('Saving model trajectory to {}...'.format(model_filename))
 IO.save_model(model_filename,[System.timesteps,x,y,z],["%.2f","%.6e","%.6e","%.6e"],
@@ -168,8 +127,6 @@ zt = pos_track[:,2]
 rt  = np.linalg.norm(pos_track,axis=1)
 rt_s = np.linalg.norm(pos_s_track,axis=1)
 print('Done')
-
-quit()
 
 # TRAJECTORIES
 print('Plotting trajectories...')
@@ -188,7 +145,58 @@ print('Done')
 #-----------------------------------ANALYSIS---------------------------------#
 #----------------------------------------------------------------------------#
 
-quit()
+if not System.run_ang_corr:
+    print("Program finished")
+    quit()
+
+# Angular correlation
+print("Computing angular correlation...")
+tau, angcorr = Data.ang_corr(rhat,System.time_step)
+print("Done")
+
+# Save ang. corr. data to file
+model_filename="angcorr_{:03.0f}s.txt".format(np.max(System.max_time))
+print('Saving angular correlation data to {}...'.format(model_filename))
+IO.save_model(model_filename,[t1,corr1],["%.2f","%.6e"],System.paramstring)
+print('Done')
+
+cfit = np.exp(-2.0*System.rot_diffusion_constant*tfit)
+chfit = np.exp(-System.rot_diffusion_constant*tfit)
+clog = np.where(corr1<=0,1e-5,corr1)
+tc = 1.0/(2*System.rot_diffusion_constant)
+cc = 0.333
+
+print(tau[150], angcorr[150])
+
+plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau = 1/2D_r$")
+plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
+plt.plot(tau,cfit,color='r',label="exp($-2D_r\\tau$)")
+plt.plot(tau,chfit,color='b',label="exp($-D_r\\tau$)")
+plt.plot(tau,angcorr,'k+',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
+plt.xscale('log')
+plt.xlabel("$\\tau$ (s)")
+plt.ylim(-0.2,1.0)
+plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
+plt.legend()
+plt.savefig('angcorr.png',dpi=400)
+plt.close()
+
+plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau_c = 1/2D_r = 3$s")
+plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
+plt.plot(tau,np.where(cfit<=1e-5,1e-5,cfit),color='r',label="exp($-2D_r\\tau$)")
+plt.plot(tau,np.where(chfit<=1e-5,1e-5,chfit),color='b',label="exp($-D_r\\tau$)")
+plt.plot(tau,clog,'k+',ms=1,label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
+plt.xlabel("$\\tau$ (s)")
+plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
+plt.xlim(0,20)
+plt.yscale('log')
+plt.legend()
+plt.savefig('angcorr_log.png',dpi=400)
+plt.close()
+
+if not System.run_delay_time:
+    print("Program finished")
+    quit()
 
 # Delay-time averaging
 print('Delay-time averaging data...')

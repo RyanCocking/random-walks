@@ -20,7 +20,7 @@ class System:
     rot_diffusion_constant = (boltz*temperature)/(8.0*np.pi*0.1*viscosity*(1e-6*cell_radius)**3)  # rad^2/s
 
     # Time
-    max_time = 200.0     # s
+    max_time = 100.0     # s
     time_step = 0.02  # s
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -37,4 +37,8 @@ class System:
     "tmax={4:3.1f} s, dt={5:5.3f} s, seed={6:2d}, <v>={7:4.1f} mu/s, lambda_T={8:6.2f}".format(
     temperature, viscosity, diffusion_constant, rot_diffusion_constant, max_time, time_step,
     seed, mean_speed, tumble_prob)
+
+    # Flags (debug mode)
+    run_ang_corr = True
+    run_delay_time = False
 
