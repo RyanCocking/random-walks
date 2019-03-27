@@ -106,6 +106,8 @@ class Cell3D:
         theta_t = np.random.normal(loc=tumble_mean, scale=tumble_stddev, size=None)
         phi = np.random.uniform(0, 2.0*np.pi)
         self.direction = rotate(self.direction, theta_t, phi)
+        
+        return theta_t
 
 
     def draw_brownian_step(dim, D, dt):
@@ -151,9 +153,9 @@ class Cell3D:
 
         theta_rbm = Cell3D.draw_brownian_step(2, rot_diffusion_constant, time_step)
         phi = np.random.uniform(0, 2.0*np.pi)
-
         self.direction = rotate(self.direction, theta_rbm, phi)
 
+        return theta_rbm
 
     def update(self, diffusion_constant, rot_diffusion_constant, time_step):
         """Called once per time step:
@@ -178,16 +180,15 @@ class Cell3D:
 
         self.run(time_step)
         self.trans_brownian_motion(diffusion_constant, time_step)        
-        self.rot_brownian_motion(rot_diffusion_constant, time_step)
+        rbm_angle = self.rot_brownian_motion(rot_diffusion_constant, time_step)
 
         # Compute angle of rotation
-        rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM
+        #rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM
         angle = rbm_angle
 
         # Perform tumble if dice roll successful
         if np.random.random() < self.tumble_chance:
-            self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
-            angle = np.arccos(np.dot(old_direction,self.direction))  # Angle due to RBM and tumble
+            angle = self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
