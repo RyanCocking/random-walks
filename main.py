@@ -202,7 +202,8 @@ tau_values = System.timesteps[1:-1]  # segments in range 1 <= tau < tmax
 segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
         dtype='int')  # width (in integer steps) of tau segments
 
-datasets = [x,y,z,r,theta,xb,yb,zb,rb,thetab]
+#datasets = [x,y,z,r,theta,xb,yb,zb,rb,thetab]
+datasets = [r,theta,rb,thetab]
 data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
     System.time_step)
 
@@ -215,30 +216,35 @@ data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
 #mean_y = mean[1]
 #mean_z = mean[2]
 #mean_r = mean[3]
-msq_x  = msq[0]
-msq_y  = msq[1]
-msq_z  = msq[2]
-msq_r  = msq[3]
-msq_theta = msq[4]
+#msq_x  = msq[0]
+#msq_y  = msq[1]
+#msq_z  = msq[2]
+#msq_r  = msq[3]
+#msq_theta = msq[4]
+msq_r = msq[0]
+msq_theta = msq[1]
+
 
 # brownian
-xb_tau = data_tau[5]
-yb_tau = data_tau[6]
-zb_tau = data_tau[7]
-rb_tau = data_tau[8]
-thetab_tau = data_tau[9]
+#xb_tau = data_tau[5]
+#yb_tau = data_tau[6]
+#zb_tau = data_tau[7]
+#rb_tau = data_tau[8]
+#thetab_tau = data_tau[9]
 #mean_xb = mean[5]
 #mean_yb = mean[6]
 #mean_zb = mean[7]
 #mean_rb = mean[8]
-msq_xb  = msq[5]
-msq_yb  = msq[6]
-msq_zb  = msq[7]
-msq_rb  = msq[8]
-msq_thetab = msq[9]
+#msq_xb  = msq[5]
+#msq_yb  = msq[6]
+#msq_zb  = msq[7]
+#msq_rb  = msq[8]
+#msq_thetab = msq[9]
+msq_rb = msq[2]
+msq_thetab = msq[3]
 print('Done')
 
-# TAU VS. MEAN SQUARE SCATTER PLOTS
+# DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
 print('Plotting graphs...')
 title_d=System.title+", $D={:6.4f}\mu m^2$".format(System.diffusion_constant)
 title_d+="$s^{-1}$"
@@ -246,18 +252,18 @@ title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constan
 title_dr+="$s^{-1}$"
 
 # brownian
-fit_xyz = 2*System.diffusion_constant*tau_values
+#fit_xyz = 2*System.diffusion_constant*tau_values
 fit_r = 6*System.diffusion_constant*tau_values
 fit_th = 4*System.rot_diffusion_constant*tau_values
-fg.scatter([tau_values,msq_xb], 
-        ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # x
-fg.scatter([tau_values,msq_yb],
-        ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # y
-fg.scatter([tau_values,msq_zb],
-        ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # z
+#fg.scatter([tau_values,msq_xb], 
+        #["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_x', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # x
+#fg.scatter([tau_values,msq_yb],
+        #["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_y', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # y
+#fg.scatter([tau_values,msq_zb],
+        #["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_z', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # z
 fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title_d, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # r
@@ -267,15 +273,15 @@ fg.scatter([tau_values,msq_thetab],
         fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$")  # Theta
 
 # model
-fg.scatter([tau_values,msq_x],
-        ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_x', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # x
-fg.scatter([tau_values,msq_y],
-        ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_y', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # y
-fg.scatter([tau_values,msq_z],
-        ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-        'tau_VS_msq_z', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # z
+#fg.scatter([tau_values,msq_x],
+        #["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_x', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # x
+#fg.scatter([tau_values,msq_y],
+        #["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_y', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # y
+#fg.scatter([tau_values,msq_z],
+        #["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+        #'tau_VS_msq_z', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # z
 fg.scatter([tau_values,msq_r],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
@@ -286,19 +292,19 @@ fg.scatter([tau_values,msq_theta],
 
 # PROBABILITY DISTRIBUTIONS
 # brownian
-fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_p_tau1',title_d,tag='bm_')  # x
-fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_p_tau1',title_d,tag='bm_')  # y
-fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_p_tau1',title_d,tag='bm_')  # z
+#fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_p_tau1',title_d,tag='bm_')  # x
+#fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_p_tau1',title_d,tag='bm_')  # y
+#fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_p_tau1',title_d,tag='bm_')  # z
 
-fit_r=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
-fit_p=ss.norm.pdf(fit_r,0,np.sqrt(6*System.diffusion_constant*System.time_step))
-fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_p_tau1',title_d,tag='bm_',fit=True,fitdata=[fit_r,fit_p],
-    fitlabel=r"$P(r,t)=\frac{1}{\sqrt{12\pi D\Delta t}}\exp\left[{\frac{-r^2}{12D\Delta t}}\right]$")  # r
+#fit_r=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
+#fit_p=ss.norm.pdf(fit_r,0,np.sqrt(6*System.diffusion_constant*System.time_step))
+#fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_p_tau1',title_d,tag='bm_',fit=True,fitdata=[fit_r,fit_p],
+    #fitlabel=r"$P(r,t)=\frac{1}{\sqrt{12\pi D\Delta t}}\exp\left[{\frac{-r^2}{12D\Delta t}}\right]$")  # r
 
-fit_th=np.linspace(-15,15,num=1000)
-fit_p=ss.norm.pdf(fit_th,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
-fg.distribution(np.rad2deg(thetab_tau[0]),'$\\Theta(\\tau=1)$ $(deg)$','Theta_VS_p_tau1',title_dr, 
-    tag='bm_',fit=True, fitdata=[fit_th,fit_p],
-    fitlabel=r"$P(\Theta_{rbm},t)=\frac{1}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\Theta_{rbm}^2}{8D_r\Delta t}}\right]$")  # theta
+#fit_th=np.linspace(-15,15,num=1000)
+#fit_p=ss.norm.pdf(fit_th,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
+#fg.distribution(np.rad2deg(thetab_tau[0]),'$\\Theta(\\tau=1)$ $(deg)$','Theta_VS_p_tau1',title_dr, 
+    #tag='bm_',fit=True, fitdata=[fit_th,fit_p],
+    #fitlabel=r"$P(\Theta_{rbm},t)=\frac{1}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\Theta_{rbm}^2}{8D_r\Delta t}}\right]$")  # theta
 
 print('Done')
