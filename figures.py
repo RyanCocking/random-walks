@@ -28,7 +28,7 @@ class FigureTemplate(mpl.figure.Figure):
 
 def scatter(data, axis_labels, dataname, title, tag="", final=True, 
             regress=False, fit=False, fitdata=[[0],[0]], fitlabel="Fit", 
-            logx=False, logy=False):
+            logx=False, logy=False, limx=[], limy=[]):
     """2D scatter plot. Input lists taken in as [x,y]."""
 
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
@@ -49,7 +49,7 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
     plt.ylabel(axis_labels[1])
 
     # optional linear regression
-    if regress==True:
+    if regress:
         reg_data = ss.linregress(x,y)
         slope = reg_data[0]
         yint = reg_data[1]
@@ -58,19 +58,23 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         figname += '_linreg'
 
     # optional line fitting
-    if fit==True:
+    if fit:
         xfit = fitdata[0]
         yfit = fitdata[1]
         plt.plot(xfit,yfit,'r--',lw=1,label=fitlabel)
         figname += '_fitted'
 
-    if logx:
-        plt.xscale('log')
-    
-    if logy:
-        plt.yscale('log')
-
-    if final==True:
+    if final:
+        if logx:
+            plt.xscale('log')
+        if logy:
+            plt.yscale('log')
+        
+        if limx:
+            plt.xlim(limx[0],limx[1])
+        if limy:
+            plt.ylim(limy[0],limy[1])
+        
         plt.legend()
         plt.tight_layout()
         plt.savefig(folder+tag+figname+'.png',dpi=400)
