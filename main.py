@@ -100,21 +100,21 @@ directions = np.array(directions)
 xb = brownian_positions[0,:,0]
 yb = brownian_positions[0,:,1]
 zb = brownian_positions[0,:,2]
-rb = np.linalg.norm(brownian_positions,axis=2)[0]
-thetab = rbm_angles[0,:]   # incorrect theta
+rb = np.sqrt(np.square(xb) + np.square(yb) + np.square(zb))
+thetab = rbm_angles[0,:]
 # swimming & brownian
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
-r = np.linalg.norm(positions,axis=2)[0]
-theta = angles[0,:]   # incorrect theta
+r = np.sqrt(np.square(x) + np.square(y) + np.square(z))
+theta = angles[0,:]
 rhat = directions[0,:]
 print('Done')
 
 # Save trajectory to file
 model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))
 print('Saving model trajectory to {}...'.format(model_filename))
-IO.save_model(model_filename,[System.timesteps,x,y,z],["%.2f","%.6e","%.6e","%.6e"],
+IO.save_model(model_filename,[System.timesteps,x,y,z,r],["%.2f","%.6e","%.6e","%.6e","%.6e"],
     System.paramstring)
 print('Done')
 
@@ -221,9 +221,6 @@ data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
 #msq_z  = msq[2]
 #msq_r  = msq[3]
 #msq_theta = msq[4]
-msq_r = msq[0]
-msq_theta = msq[1]
-
 
 # brownian
 #xb_tau = data_tau[5]
@@ -240,8 +237,22 @@ msq_theta = msq[1]
 #msq_zb  = msq[7]
 #msq_rb  = msq[8]
 #msq_thetab = msq[9]
+
+mean_r = mean[0]
+mean_theta = mean[1]
+mean_rb = mean[2]
+mean_thetab = mean[3]
+
+msq_r = msq[0]
+msq_theta = msq[1]
 msq_rb = msq[2]
 msq_thetab = msq[3]
+print('Done')
+
+# Save delay time data to file
+model_filename="MeanSquare_{:03.0f}s.txt".format(np.max(System.max_time))
+print('Saving mean square theta data to {}...'.format(model_filename))
+IO.save_model(model_filename,[tau_values,msq_theta],["%.2f","%.6e"],System.paramstring)
 print('Done')
 
 # DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
@@ -268,9 +279,13 @@ fg.scatter([tau_values,msq_rb],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title_d, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # r
 fg.scatter([tau_values,msq_thetab],
-        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_Theta',
+        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
         title_dr, tag='bm_', fit=True, fitdata=[tau_values,fit_th],
-        fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$")  # Theta
+        fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=False, limy=[0,15], limx=[0,20])  # Theta
+fg.scatter([tau_values,msq_thetab],
+        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
+        title_dr, tag='2bm_', fit=True, fitdata=[tau_values,fit_th],
+        fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=True)  # Theta
 
 # model
 #fg.scatter([tau_values,msq_x],
@@ -286,7 +301,7 @@ fg.scatter([tau_values,msq_r],
         ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
         'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
 fg.scatter([tau_values,msq_theta],
-        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_Theta',
+        ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
         title_dr, tag='model_', fit=False)  # Theta
 
 

@@ -67,6 +67,8 @@ class Cell3D:
         self.velocity = self.speed * self.direction
         self.tumble_chance = tumble_chance  # probability per time step
         self.run_duration = 0
+        self.angdev = 0.0  # angular deviation (displacement)
+        self.rbm_angdev = 0.0
 
         self.swim_history = []
         self.swim_history.append(np.copy(self.swim_position))  # run & tumble
@@ -181,6 +183,7 @@ class Cell3D:
         self.run(time_step)
         self.trans_brownian_motion(diffusion_constant, time_step)        
         rbm_angle = self.rot_brownian_motion(rot_diffusion_constant, time_step)
+        self.rbm_angdev += rbm_angle
 
         # Compute angle of rotation
         #rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM
@@ -193,10 +196,12 @@ class Cell3D:
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
 
+        self.angdev += angle
+        
         # Append data to lists
         self.brownian_history.append(np.copy(self.brownian_position))  # TBM
         self.swim_history.append(np.copy(self.swim_position))  # Runs
         self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # TBM and runs
-        self.rbm_angle_history.append(rbm_angle)  # RBM
-        self.angle_history.append(angle)  # RBM and tumbles
+        self.rbm_angle_history.append(self.rbm_angdev)  # RBM
+        self.angle_history.append(self.angdev)  # RBM and tumbles
         self.direction_history.append(np.copy(self.direction))  # rhat
