@@ -27,7 +27,8 @@ class FigureTemplate(mpl.figure.Figure):
 
 
 def scatter(data, axis_labels, dataname, title, tag="", final=True, 
-            regress=False, fit=False, fitdata=[[0],[0]], fitlabel="Fit"):
+            regress=False, fit=False, fitdata=[[0],[0]], fitlabel="Fit", 
+            logx=False, logy=False):
     """2D scatter plot. Input lists taken in as [x,y]."""
 
     fig = plt.figure(FigureClass=FigureTemplate, figtitle=title)
@@ -62,6 +63,12 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
         yfit = fitdata[1]
         plt.plot(xfit,yfit,'r--',lw=1,label=fitlabel)
         figname += '_fitted'
+
+    if logx:
+        plt.xscale('log')
+    
+    if logy:
+        plt.yscale('log')
 
     if final==True:
         plt.legend()
