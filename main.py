@@ -200,8 +200,7 @@ if System.run_delay_time:
     segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
             dtype='int')  # width (in integer steps) of tau segments
 
-    #datasets = [x,y,z,r,theta,xb,yb,zb,rb,thetab]
-    datasets = [r,theta,rb,thetab]
+    datasets = [xb,yb,zb]
     data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
         System.time_step)
 
@@ -221,36 +220,24 @@ if System.run_delay_time:
     #msq_theta = msq[4]
 
     # brownian
-    #xb_tau = data_tau[5]
-    #yb_tau = data_tau[6]
-    #zb_tau = data_tau[7]
-    #rb_tau = data_tau[8]
+    xb_tau = data_tau[0]
+    yb_tau = data_tau[1]
+    zb_tau = data_tau[2]
     #thetab_tau = data_tau[9]
-    #mean_xb = mean[5]
-    #mean_yb = mean[6]
-    #mean_zb = mean[7]
-    #mean_rb = mean[8]
-    #msq_xb  = msq[5]
-    #msq_yb  = msq[6]
-    #msq_zb  = msq[7]
-    #msq_rb  = msq[8]
+    mean_xb = mean[0]
+    mean_yb = mean[1]
+    mean_zb = mean[2]
+    msq_xb  = msq[0]
+    msq_yb  = msq[1]
+    msq_zb  = msq[2]
+    msq_rb  = msq_xb + msq_yb + msq_zb
     #msq_thetab = msq[9]
-
-    mean_r = mean[0]
-    mean_theta = mean[1]
-    mean_rb = mean[2]
-    mean_thetab = mean[3]
-
-    msq_r = msq[0]
-    msq_theta = msq[1]
-    msq_rb = msq[2]
-    msq_thetab = msq[3]
     print('Done')
 
     # Save delay time data to file
     model_filename="MeanSquare_{:03.0f}s.txt".format(np.max(System.max_time))
-    print('Saving mean square theta data to {}...'.format(model_filename))
-    IO.save_model(model_filename,[tau_values,msq_theta],["%.2f","%.6e"],System.paramstring)
+    print('Saving mean square x,y,z,r data to {}...'.format(model_filename))
+    IO.save_model(model_filename,[tau_values,msq_xb,msq_yb,msq_zb,msq_rb],["%.2f","%.6e","%.6e","%.6e","%.6e"],System.paramstring)
     print('Done')
 
     # DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
@@ -261,29 +248,34 @@ if System.run_delay_time:
     title_dr+="$s^{-1}$"
 
     # brownian
-    #fit_xyz = 2*System.diffusion_constant*tau_values
+    fit_xyz = 2*System.diffusion_constant*tau_values
     fit_r = 6*System.diffusion_constant*tau_values
     fit_th = 4*System.rot_diffusion_constant*tau_values
-    #fg.scatter([tau_values,msq_xb], 
-            #["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            #'tau_VS_msq_x', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # x
-    #fg.scatter([tau_values,msq_yb],
-            #["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            #'tau_VS_msq_y', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # y
-    #fg.scatter([tau_values,msq_zb],
-            #["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            #'tau_VS_msq_z', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # z
+    fg.scatter([tau_values,msq_xb], 
+            ["$\\tau$ (s)","$\langle x^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+            'tau_VS_msq_x', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # x
+    fg.scatter([tau_values,msq_yb],
+            ["$\\tau$ (s)","$\langle y^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+            'tau_VS_msq_y', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # y
+    fg.scatter([tau_values,msq_zb],
+            ["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+            'tau_VS_msq_z', title_d,tag='bm_', fit=True, fitdata=[tau_values,fit_xyz])  # z
     fg.scatter([tau_values,msq_rb],
             ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            'tau_VS_msq_r', title_d, tag='bm_', fit=True, fitdata=[tau_values,fit_r])  # r
-    fg.scatter([tau_values,msq_thetab],
-            ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
-            title_dr, tag='bm_', fit=True, fitdata=[tau_values,fit_th],
-            fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=False, limy=[0,15], limx=[0,20])  # Theta
-    fg.scatter([tau_values,msq_thetab],
-            ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
-            title_dr, tag='2bm_', fit=True, fitdata=[tau_values,fit_th],
-            fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=True, limy=[0,40])  # Theta
+            'tau_VS_msq_r', title_d, tag='3bm_', fit=True, fitdata=[tau_values,fit_r],
+            fitlabel="6Dt", limx=[0,200], limy=[0,100])  # r
+    fg.scatter([tau_values,msq_rb],
+            ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+            'tau_VS_msq_r', title_d, tag='2bm_', fit=True, fitdata=[tau_values,fit_r],
+            fitlabel="6Dt", limx=[0,10], limy=[0,15])  # r
+    #fg.scatter([tau_values,msq_thetab],
+            #["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
+            #title_dr, tag='bm_', fit=True, fitdata=[tau_values,fit_th],
+            #fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=False, limy=[0,15], limx=[0,20])  # Theta
+    #fg.scatter([tau_values,msq_thetab],
+            #["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
+            #title_dr, tag='2bm_', fit=True, fitdata=[tau_values,fit_th],
+            #fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$", logx=True, limy=[0,40])  # Theta
 
     # model
     #fg.scatter([tau_values,msq_x],
@@ -295,19 +287,19 @@ if System.run_delay_time:
     #fg.scatter([tau_values,msq_z],
             #["$\\tau$ (s)","$\langle z^2_{\\tau} \\rangle$ $(\mu m^2)$"],
             #'tau_VS_msq_z', title_d,tag='model_', fit=False, fitdata=[tau_values,fit_xyz])  # z
-    fg.scatter([tau_values,msq_r],
-            ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
-    fg.scatter([tau_values,msq_theta],
-            ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
-            title_dr, tag='model_', fit=False)  # Theta
+    #fg.scatter([tau_values,msq_r],
+            #["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+            #'tau_VS_msq_r', title_d, tag='model_', fit=False, fitdata=[tau_values,fit_r])  # r
+    #fg.scatter([tau_values,msq_theta],
+            #["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta',
+            #title_dr, tag='model_', fit=False)  # Theta
 
 
     # PROBABILITY DISTRIBUTIONS
     # brownian
-    #fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_p_tau1',title_d,tag='bm_')  # x
-    #fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_p_tau1',title_d,tag='bm_')  # y
-    #fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_p_tau1',title_d,tag='bm_')  # z
+    fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_p_tau1',title_d,tag='bm_')  # x
+    fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_p_tau1',title_d,tag='bm_')  # y
+    fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_p_tau1',title_d,tag='bm_')  # z
 
     #fit_r=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
     #fit_p=ss.norm.pdf(fit_r,0,np.sqrt(6*System.diffusion_constant*System.time_step))
