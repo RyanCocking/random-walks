@@ -159,8 +159,14 @@ class Cell3D:
 
         return theta_rbm
 
-    def update(self, diffusion_constant, rot_diffusion_constant, time_step):
-        """Called once per time step:
+    def update(self, diffusion_constant, rot_diffusion_constant, time_step,
+               enable_run=True, enable_tumble=True, enable_tbm=True,
+               enable_rbm=True):
+        """
+        
+        PLEASE UPDATE THIS COMMENT
+        
+        Called once per time step:
              1) Record the original direction in which the cell is facing.
              2) Perform a run in this direction and increment the run duration.
              3) Undergo translational Brownian motion (TBM).
@@ -178,19 +184,21 @@ class Cell3D:
              7) Append data to lists and exit.
         """
         
-        old_direction = np.copy(self.direction)
-
-        self.run(time_step)
-        self.trans_brownian_motion(diffusion_constant, time_step)        
-        rbm_angle = self.rot_brownian_motion(rot_diffusion_constant, time_step)
-        self.rbm_angdev += rbm_angle
-
-        # Compute angle of rotation
-        #rbm_angle = np.arccos(np.dot(old_direction,self.direction))  # Angle from RBM
-        angle = rbm_angle
+        if enable_run:
+            self.run(time_step)
+            
+        if enable_tbm:
+            self.trans_brownian_motion(diffusion_constant, time_step)        
+            
+        if enable_rbm:
+            rbm_angle = self.rot_brownian_motion(rot_diffusion_constant, time_step)
+            self.rbm_angdev += rbm_angle
+            angle = rbm_angle
+        else:
+            angle = 0.0
 
         # Perform tumble if dice roll successful
-        if np.random.random() < self.tumble_chance:
+        if (np.random.random() < self.tumble_chance) and (enable_tumble):
             angle = self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
