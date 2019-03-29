@@ -23,6 +23,7 @@ for i in range(1):
         time_step=System.time_step))
 
 # Print simulation parameters at start
+print("Simulation: {0:s}".format(System.sim_name))
 print("Simulating {0:1d} cell of {1:s}".format(len(swimmers),swimmers[0].name))
 print(System.param_string)
 
@@ -37,40 +38,40 @@ for time in System.timesteps[1:]:
 
 print('Done')
 
-## PLACE THIS IN A FUNCTION========
-#plt.title(System.title)
-#plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
-#x=np.linspace(1,max(swimmer.run_durations),num=50)
-#fit=0.1*np.exp(-0.1*x)
-#plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.1$')
-#plt.yscale('log')
-#plt.ylim(0.001,1)
-#plt.xlim(min(x),max(x))
-#plt.ylabel('Probability density')
-#plt.xlabel('Run duration (s)')
-##plt.grid(True)
-#plt.legend()
-#plt.savefig('RunDurationsLog.png')
-#plt.yscale('linear')
-#plt.ylim(0,0.2)
-#plt.savefig('RunDurationsLinear.png')
-#plt.close()
-
-if System.cell_run:
-    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
-    plt.hist(ang, bins='auto', density=True, edgecolor='black')
-    x=np.linspace(-20,20,num=100)
-    fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(2*System.rot_diffusion_constant*System.time_step)))
-    title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
-    title_dr+="$s^{-1}$"
-    plt.title(title_dr)
-    plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{4\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{4D_r\Delta t}}\right]$")
-    plt.xlim(0,16)
+if System.cell_run and System.cell_tumble:
+    plt.title(System.title)
+    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
+    x=np.linspace(1,max(swimmer.run_durations),num=100)
+    fit=System.tumble_prob*np.exp(-System.tumble_prob*x)
+    plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.05$')
+    plt.yscale('log')
+    plt.ylim(0.001,1)
+    plt.xlim(min(x),max(x))
     plt.ylabel('Probability density')
-    plt.xlabel('Angular deviation between adjacent timesteps (deg)')
+    plt.xlabel('Run duration (s)')
+    #plt.grid(True)
     plt.legend()
-    plt.savefig("AngleDist{0:s}.png".format(System.file_id),dpi=400)
+    plt.savefig("RunDurLog{0:s}.png".format(System.file_id))
+    plt.yscale('linear')
+    plt.ylim(0,0.075)
+    plt.savefig("RunDur{0:s}.png".format(System.file_id))
     plt.close()
+
+#if System.cell_rbm or System.cell_tumble:
+    #ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
+    #plt.hist(ang, bins='auto', density=True, edgecolor='black')
+    #x=np.linspace(-20,20,num=100)
+    #fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
+    #title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
+    #title_dr+="$s^{-1}$"
+    #plt.title(title_dr)
+    #plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
+    #plt.xlim(0,16)
+    #plt.ylabel('Probability density')
+    #plt.xlabel('Angular deviation between adjacent timesteps (deg)')
+    #plt.legend()
+    #plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
+    #plt.close()
 
 #----------------------------------------------------------------------------#
 #---------------------------------TRAJECTORIES-------------------------------#
