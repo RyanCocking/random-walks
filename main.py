@@ -41,20 +41,23 @@ print('Done')
 if System.cell_run and System.cell_tumble:
     plt.title(System.title)
     plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
-    x=np.linspace(1,max(swimmer.run_durations),num=100)
-    fit=System.tumble_prob*np.exp(-System.tumble_prob*x)
-    plt.plot(x,fit,'r',lw=2,label='$\lambda e^{-\lambda t},\ \lambda=0.05$')
+    x=np.linspace(0,max(swimmer.run_durations),num=100)
+    l = System.tumble_prob/System.time_step
+    fit=l*np.exp(-l*x)
+    plt.plot(x,fit,'r',lw=2,label="$\\frac{\lambda_T}{\Delta t} e^{-\lambda_T t/\Delta t }$"+
+             " ; $\lambda_T={:4.2f}$, $\langle t \\rangle={:4.2f}$".format(System.tumble_prob, 1.0/l))
     plt.yscale('log')
-    plt.ylim(0.001,1)
-    plt.xlim(min(x),max(x))
+    plt.ylim(0.001,1.1*l)
+    plt.xlim(0,max(x))
     plt.ylabel('Probability density')
     plt.xlabel('Run duration (s)')
     #plt.grid(True)
     plt.legend()
     plt.savefig("RunDurLog{0:s}.png".format(System.file_id))
     plt.yscale('linear')
-    plt.ylim(0,0.075)
+    #plt.ylim(0,1.1*l)
     plt.savefig("RunDur{0:s}.png".format(System.file_id))
+    plt.show()
     plt.close()
 
 #if System.cell_rbm or System.cell_tumble:
@@ -202,7 +205,7 @@ if System.run_delay_time:
             dtype='int')  # width (in integer steps) of tau segments
 
     datasets = [x,y,z]
-    data_tau, msq = Data.delay_time_loop(datasets, segments, System.time_step)
+    msq = Data.delay_time_loop(datasets, segments, System.time_step)
 
     # swimming & brownian
     #x_tau = data_tau[0]

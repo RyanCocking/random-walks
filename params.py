@@ -6,24 +6,25 @@ class System:
     # Physical constants
     boltz=1.38064852e-23  # J/k
    
+    # Time (s)
+    max_time = 1000.0
+    time_step = 0.02
+    total_steps = int(max_time / time_step)
+    timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
+   
     # System parameters
     box_size = 1000    # mu
     temperature = 300.0  # K
     viscosity = 0.01  # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     cell_radius = 1.0  # mu
-    tumble_prob = 0.05  # per timestep
+    tumble_prob = 0.05
     mean_speed = 20  # mu/s
+    mean_run_dur = 1.0/(tumble_prob/time_step)  # according to Poisson interval distribution
 
-    # Diffusion constants (Stokes-Einstein relation)
+    # Diffusion constants (Stokes-Einstein equation)
     diffusion_constant = (boltz*temperature)/(6.0*np.pi*0.1*viscosity*1e-6*cell_radius)  # m^2/s
     diffusion_constant *= 1e12   # mu^2/s
     rot_diffusion_constant = (boltz*temperature)/(8.0*np.pi*0.1*viscosity*(1e-6*cell_radius)**3)  # rad^2/s
-
-    # Time
-    max_time = 1000.0     # s
-    time_step = 0.02  # s
-    total_steps = int(max_time / time_step)
-    timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
 
     # Random number seed
     seed = 98
@@ -32,11 +33,11 @@ class System:
     # Simulation flags
     cell_run = True
     cell_tumble = True
+    cell_tbm = True
     cell_rbm = True
-    cell_tbm = False
-        
+    
     # Data analysis flags
-    run_ang_corr = True
+    run_ang_corr = False
     run_delay_time = True
 
     # Graph header
