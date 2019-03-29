@@ -24,7 +24,7 @@ for i in range(1):
 
 # Print simulation parameters at start
 print("Simulating {0:1d} cell of {1:s}".format(len(swimmers),swimmers[0].name))
-print(System.paramstring)
+print(System.param_string)
 
 # Step through time in range 1 <= t <= tmax
 print('Computing cell trajectories...')
@@ -69,7 +69,7 @@ if System.cell_run:
     plt.ylabel('Probability density')
     plt.xlabel('Angular deviation between adjacent timesteps (deg)')
     plt.legend()
-    plt.savefig('AngleDev.png',dpi=400)
+    plt.savefig("AngleDist{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
 #----------------------------------------------------------------------------#
@@ -114,34 +114,34 @@ rhat = directions[0,:]
 print('Done')
 
 # Save trajectory to file
-model_filename="model_{:03.0f}s.txt".format(np.max(System.max_time))
+model_filename="ModelTraj{0:s}.txt".format(System.file_id)
 print('Saving model trajectory to {}...'.format(model_filename))
 IO.save_model(model_filename,[System.timesteps,x,y,z,r],["%.2f","%.6e","%.6e","%.6e","%.6e"],
-    System.paramstring)
+    System.param_string)
 print('Done')
 
-# EXPERIMENT DATA
-print('Loading experimental trajectory from file...')
-t_track, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
-xt = pos_track[:,0]
-yt = pos_track[:,1]
-zt = pos_track[:,2]
-rt  = np.linalg.norm(pos_track,axis=1)
-rt_s = np.linalg.norm(pos_s_track,axis=1)
-print('Done')
+## EXPERIMENT DATA
+#print('Loading experimental trajectory from file...')
+#t_track, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
+#xt = pos_track[:,0]
+#yt = pos_track[:,1]
+#zt = pos_track[:,2]
+#rt  = np.linalg.norm(pos_track,axis=1)
+#rt_s = np.linalg.norm(pos_s_track,axis=1)
+#print('Done')
 
-# TRAJECTORIES
-print('Plotting trajectories...')
-# model
-fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
-fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
+## TRAJECTORIES
+#print('Plotting trajectories...')
+## model
+#fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
+#fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
 
-# experiment
-fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
-fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
-fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
-fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
-print('Done')
+## experiment
+#fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
+#fg.scatter([t_track,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
+#fg.scatter([t_track,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
+#fg.scatter([t_track,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
+#print('Done')
 
 #----------------------------------------------------------------------------#
 #-----------------------------------ANALYSIS---------------------------------#
@@ -155,9 +155,9 @@ if System.run_ang_corr:
     print("Done")
 
     # Save ang. corr. data to file
-    model_filename="angcorr_{:03.0f}s.txt".format(np.max(System.max_time))
+    model_filename="AngCorr{0:s}.txt".format(System.file_id)
     print('Saving angular correlation data to {}...'.format(model_filename))
-    IO.save_model(model_filename,[tau,angcorr],["%.2f","%.6e"],System.paramstring)
+    IO.save_model(model_filename,[tau,angcorr],["%.2f","%.6e"],System.param_string)
     print('Done')
 
     cfit = np.exp(-2.0 * System.rot_diffusion_constant * tau)
@@ -176,7 +176,7 @@ if System.run_ang_corr:
     plt.ylim(-0.2,1.0)
     plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
     plt.legend()
-    plt.savefig('angcorr.png',dpi=400)
+    plt.savefig("AngCorr{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
     plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau_c = 1/2D_r = 3$s")
@@ -189,7 +189,7 @@ if System.run_ang_corr:
     plt.xlim(0,20)
     plt.yscale('log')
     plt.legend()
-    plt.savefig('angcorr_log.png',dpi=400)
+    plt.savefig("AngCorrLog{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
 if System.run_delay_time:
@@ -235,10 +235,12 @@ if System.run_delay_time:
     print('Done')
 
     # Save delay time data to file
-    model_filename="MeanSquare_{:03.0f}s.txt".format(np.max(System.max_time))
-    print('Saving mean square x,y,z,r data to {}...'.format(model_filename))
-    IO.save_model(model_filename,[tau_values,msq_xb,msq_yb,msq_zb,msq_rb],["%.2f","%.6e","%.6e","%.6e","%.6e"],System.paramstring)
+    model_filename="MeanSquare{0:s}.txt".format(System.file_id)
+    print('Saving mean squared displacement data to {}...'.format(model_filename))
+    IO.save_model(model_filename,[tau_values,msq_rb],["%.2f","%.6e"],System.param_string)
     print('Done')
+    
+    quit()
 
     # DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
     print('Plotting graphs...')
