@@ -7,7 +7,7 @@ class System:
     boltz=1.38064852e-23  # J/k
    
     # Time (s)
-    max_time = 34.0
+    max_time = 1000.0
     time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -18,7 +18,7 @@ class System:
     viscosity = 0.01  # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     cell_radius = 1.0  # mu
     mean_speed = 20  # mu/s
-    tumble_prob = 0.025
+    tumble_prob = 0.05
     mean_run_dur = time_step / tumble_prob  # Poisson interval distribution: <t> = 1/lambda (scaled with timestep)
 
     # Diffusion constants (Stokes-Einstein equation)
