@@ -201,8 +201,8 @@ if System.run_delay_time:
     segments = np.linspace(1,len(tau_values),num=len(tau_values), endpoint=True, 
             dtype='int')  # width (in integer steps) of tau segments
 
-    datasets = [xb,yb,zb]
-    data_tau, mean, msq, rms = Data.delay_time_loop(datasets, segments,
+    datasets = [x,y,z]
+    data_tau, msq = Data.delay_time_loop(datasets, segments,
         System.time_step)
 
     # swimming & brownian
@@ -217,28 +217,28 @@ if System.run_delay_time:
     #msq_x  = msq[0]
     #msq_y  = msq[1]
     #msq_z  = msq[2]
-    #msq_r  = msq[3]
+    msq_r  = msq[0] +msq[1] +msq[2]
     #msq_theta = msq[4]
 
-    # brownian
-    xb_tau = data_tau[0]
-    yb_tau = data_tau[1]
-    zb_tau = data_tau[2]
-    #thetab_tau = data_tau[9]
-    mean_xb = mean[0]
-    mean_yb = mean[1]
-    mean_zb = mean[2]
-    msq_xb  = msq[0]
-    msq_yb  = msq[1]
-    msq_zb  = msq[2]
-    msq_rb  = msq_xb + msq_yb + msq_zb
-    #msq_thetab = msq[9]
+    ## brownian
+    #xb_tau = data_tau[0]
+    #yb_tau = data_tau[1]
+    #zb_tau = data_tau[2]
+    ##thetab_tau = data_tau[9]
+    #mean_xb = mean[0]
+    #mean_yb = mean[1]
+    #mean_zb = mean[2]
+    #msq_xb  = msq[0]
+    #msq_yb  = msq[1]
+    #msq_zb  = msq[2]
+    #msq_rb  = msq_xb + msq_yb + msq_zb
+    ##msq_thetab = msq[9]
     print('Done')
 
     # Save delay time data to file
     model_filename="MeanSquare{0:s}.txt".format(System.file_id)
     print('Saving mean squared displacement data to {}...'.format(model_filename))
-    IO.save_model(model_filename,[tau_values,msq_rb],["%.2f","%.6e"],System.param_string)
+    IO.save_model(model_filename,[tau_values,msq_r],["%.2f","%.6e"],System.param_string)
     print('Done')
     
     quit()

@@ -25,11 +25,11 @@ class Data:
             segment_data[i] = data[i+segment_size] - data[i]
         
         delay_time = segment_size*step_size
-        mean = np.mean(segment_data,axis=0)
+        #mean = np.mean(segment_data,axis=0)
         meansq = Data.mean_square(segment_data)
-        rms = Data.root_mean_square(segment_data)
+        #rms = Data.root_mean_square(segment_data)
 
-        return segment_data, mean, meansq, rms, delay_time
+        return segment_data, meansq, delay_time
 
     def delay_time_loop(datasets,step_segments,step_size):
         """Apply the delay time averaging method to an arbitrary number
@@ -55,8 +55,9 @@ class Data:
             rms = np.copy(mean)
     
             for i,segment in enumerate(step_segments,0):
-                sd, mean[i], meansq[i], rms[i], tau = Data.delay_time(data,
-                        segment, step_size)
+                #sd, mean[i], meansq[i], rms[i], tau = Data.delay_time(data,
+                        #segment, step_size)
+                sd, meansq[i], tau = Data.delay_time(data, segment, step_size)
                 segmented_data.append(sd)
 
             segmented_data_list.append(np.array(segmented_data))
@@ -64,7 +65,7 @@ class Data:
             meansq_list.append(meansq)
             rms_list.append(rms)
     
-        return segmented_data_list, mean_list, meansq_list, rms_list
+        return segmented_data_list, meansq_list
 
     def compute_angles(coords):
         """
