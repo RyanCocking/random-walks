@@ -7,7 +7,7 @@ class System:
     boltz=1.38064852e-23  # J/k
    
     # Time (s)
-    max_time = 1000.0
+    max_time = 34.0
     time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -17,9 +17,9 @@ class System:
     temperature = 300.0  # K
     viscosity = 0.01  # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     cell_radius = 1.0  # mu
-    tumble_prob = 0.05
     mean_speed = 20  # mu/s
-    mean_run_dur = 1.0/(tumble_prob/time_step)  # according to Poisson interval distribution
+    tumble_prob = 0.025
+    mean_run_dur = time_step / tumble_prob  # Poisson interval distribution: <t> = 1/lambda (scaled with timestep)
 
     # Diffusion constants (Stokes-Einstein equation)
     diffusion_constant = (boltz*temperature)/(6.0*np.pi*0.1*viscosity*1e-6*cell_radius)  # m^2/s
@@ -45,10 +45,10 @@ class System:
 
     # Parameter string
     param_string = "T={0:5.1f} K, eta={1:5.3f} g/cm s, D={2:6.4f} mu^2/s, D_r={3:6.4f} rad^2/s, "\
-    "tmax={4:3.1f} s, dt={5:5.3f} s, seed={6:2d}, <v>={7:4.1f} mu/s, lambda_T={8:5.2f}, "\
-    "run={9:s}, tumble={10:s}, tbm={11:s}, rbm={12:s}".format(temperature, viscosity, 
+    "tmax={4:3.1f} s, dt={5:5.3f} s, seed={6:2d}, <v>={7:4.1f} mu/s, <t>={8:5.2f} s, lambda_T={9:5.3f}, "\
+    "run={10:s}, tumble={11:s}, tbm={12:s}, rbm={13:s}".format(temperature, viscosity, 
     diffusion_constant, rot_diffusion_constant, max_time, time_step, seed, mean_speed, 
-    tumble_prob, str(cell_run), str(cell_tumble), str(cell_tbm), str(cell_rbm))
+    mean_run_dur, tumble_prob, str(cell_run), str(cell_tumble), str(cell_tbm), str(cell_rbm))
 
     # Simulation name
     sim_name = "test-"
