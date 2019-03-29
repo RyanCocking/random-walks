@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 
 class Data:
 
@@ -26,10 +26,10 @@ class Data:
         
         delay_time = segment_size*step_size
         #mean = np.mean(segment_data,axis=0)
-        meansq = Data.mean_square(segment_data)
+        meansq = np.mean(np.square(segment_data),axis=0)
         #rms = Data.root_mean_square(segment_data)
 
-        return segment_data, meansq, delay_time
+        return meansq, delay_time
 
     def delay_time_loop(datasets,step_segments,step_size):
         """Apply the delay time averaging method to an arbitrary number
@@ -43,29 +43,29 @@ class Data:
         squares, in the same order that their origin datasets were passed
         into this function."""
     
-        segmented_data_list = []
-        mean_list = []
+        #segmented_data_list = []
+        #mean_list = []
         meansq_list  = []
-        rms_list  = []
+        #rms_list  = []
 
         for data in datasets:
-            segmented_data = []
-            mean = np.zeros(len(step_segments))
-            meansq = np.copy(mean)
-            rms = np.copy(mean)
+            #segmented_data = []
+            #mean = np.zeros(len(step_segments))
+            meansq = np.zeros(len(step_segments))
+            #rms = np.copy(mean)
     
             for i,segment in enumerate(step_segments,0):
                 #sd, mean[i], meansq[i], rms[i], tau = Data.delay_time(data,
                         #segment, step_size)
-                sd, meansq[i], tau = Data.delay_time(data, segment, step_size)
-                segmented_data.append(sd)
+                meansq[i], tau = Data.delay_time(data, segment, step_size)
+                #segmented_data.append(sd)
 
-            segmented_data_list.append(np.array(segmented_data))
-            mean_list.append(mean)
+            #segmented_data_list.append(np.array(segmented_data))
+            #mean_list.append(mean)
             meansq_list.append(meansq)
-            rms_list.append(rms)
+            #rms_list.append(rms)
     
-        return segmented_data_list, meansq_list
+        return meansq_list
 
     def compute_angles(coords):
         """

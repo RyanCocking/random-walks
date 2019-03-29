@@ -202,8 +202,7 @@ if System.run_delay_time:
             dtype='int')  # width (in integer steps) of tau segments
 
     datasets = [x,y,z]
-    data_tau, msq = Data.delay_time_loop(datasets, segments,
-        System.time_step)
+    data_tau, msq = Data.delay_time_loop(datasets, segments, System.time_step)
 
     # swimming & brownian
     #x_tau = data_tau[0]
