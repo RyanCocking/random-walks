@@ -77,9 +77,10 @@ class Data:
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
         """
 
-        angles = np.zeros(coords.shape[0]-2)
+        N = coords.shape[0]-2
+        angles = np.zeros(N)
 
-        for i in range(0,len(coords)-2):
+        for i in range(0, N):
             r1 = np.array(coords[i+1] - coords[i])
             r2 = np.array(coords[i+2] - coords[i+1])
             mag_r1 = np.abs(np.linalg.norm(r1))
