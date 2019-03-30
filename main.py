@@ -39,10 +39,12 @@ for time in System.timesteps[1:]:
 print('Done')
 
 if System.cell_run and System.cell_tumble:
-    plt.title(System.title+", $\lambda_T={0:5.3f}$".format(System.tumble_prob))
     mu = np.mean(swimmer.run_durations)
     sigma = np.std(swimmer.run_durations)
-    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black', label="Model: $\mu={0:6.3f}$, $\sigma={1:6.3f}$".format(mu,sigma))
+    num_runs = len(swimmer.run_durations)
+    plt.title(System.title+", $\lambda_T={0:5.3f}$, runs={1}".format(System.tumble_prob,num_runs))
+    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black',
+        label="Model: $\mu={0:6.3f}$, $\sigma={1:6.3f}$".format(mu,sigma))
     x=np.linspace(0,max(swimmer.run_durations),num=100)
     l = System.tumble_prob/System.time_step
     fit=l*np.exp(-l*x)
@@ -72,6 +74,7 @@ if System.cell_rbm or System.cell_tumble:
     title_dr+="$s^{-1}$"
     plt.title(title_dr)
     if System.cell_rbm and not System.cell_tumble:
+        # CURRENTLY WRONG because dotted angles are used instead of recorded angles
         x=np.linspace(-20,20,num=100)
         sigma_fit = np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step))
         fit=2*ss.norm.pdf(x,0,sigma_fit)
@@ -82,13 +85,13 @@ if System.cell_rbm or System.cell_tumble:
         sigma_fit = 36
         fit=ss.norm.pdf(x,mu_fit,sigma_fit)
         plt.plot(x,fit,'r',lw=2,label="Fit: $\mu={0:7.3f}$, $\sigma={1:7.3f}$".format(mu_fit,sigma_fit))
+    if System.cell_tumble and System.cell_rbm:
+        plt.yscale('log')
     plt.ylabel('Probability density')
     plt.xlabel('Angular deviation between adjacent timesteps (deg)')
     plt.legend()
     plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
-
-quit()
 
 #----------------------------------------------------------------------------#
 #---------------------------------TRAJECTORIES-------------------------------#
