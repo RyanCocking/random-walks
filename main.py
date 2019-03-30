@@ -39,14 +39,16 @@ for time in System.timesteps[1:]:
 print('Done')
 
 if System.cell_run and System.cell_tumble:
-    plt.title(System.title)
-    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black')
+    plt.title(System.title+", $\lambda_T={0:5.3f}$".format(System.tumble_prob))
+    mu = np.mean(swimmer.run_durations)
+    sigma = np.std(swimmer.run_durations)
+    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black', label="Model: $\mu={0:6.3f}$, $\sigma={1:6.3f}$".format(mu,sigma))
     x=np.linspace(0,max(swimmer.run_durations),num=100)
     l = System.tumble_prob/System.time_step
     fit=l*np.exp(-l*x)
-    plt.plot(x,fit,'r',lw=2,label="$\\frac{\lambda_T}{\Delta t} e^{-\lambda_T t/\Delta t }$"+
-             " ; $\lambda_T={:5.3f}$, $\langle t \\rangle={:5.2f}$".format(System.tumble_prob, System.mean_run_dur))
-    plt.plot([System.mean_run_dur,System.mean_run_dur],[0.001,1.1*l],color='k',ls='--',lw=1)
+    #plt.plot(x,fit,'r',lw=2,label="$\\frac{\lambda_T}{\Delta t} e^{-\lambda_T t/\Delta t }$"+
+             #" ; $\lambda_T={:5.3f}$, $\langle t \\rangle={:5.2f}$".format(System.tumble_prob, System.mean_run_dur))
+    plt.plot(x,fit,'r',lw=2,label="Fit: $\mu=\sigma={0:6.3f}$".format(System.mean_run_dur))
     plt.yscale('log')
     plt.ylim(0.001,1.1*l)
     plt.xlim(0,max(x))
@@ -54,23 +56,32 @@ if System.cell_run and System.cell_tumble:
     plt.xlabel('Run duration (s)')
     #plt.grid(True)
     plt.legend()
-    plt.savefig("RunDurLog{0:s}.png".format(System.file_id))
+    plt.savefig("RunDurLog{0:s}.png".format(System.file_id),dpi=400)
     plt.yscale('linear')
     #plt.ylim(0,1.1*l)
-    plt.savefig("RunDur{0:s}.png".format(System.file_id))
+    plt.savefig("RunDur{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
 if System.cell_rbm or System.cell_tumble:
     ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
     ang=ang[np.where(ang>0.001)]  # remove negligible angles
-    plt.hist(ang, bins='auto', density=True, edgecolor='black')
+    mu = np.mean(ang)
+    sigma = np.std(ang)
+    plt.hist(ang, bins=50, density=True, edgecolor='black', label="Model: $\mu={0:7.3f}$, $\sigma={1:7.3f}$".format(mu,sigma))
     title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
     title_dr+="$s^{-1}$"
     plt.title(title_dr)
-    if System.cell_rbm:
+    if System.cell_rbm and not System.cell_tumble:
         x=np.linspace(-20,20,num=100)
-        fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
-        plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
+        sigma_fit = np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step))
+        fit=2*ss.norm.pdf(x,0,sigma_fit)
+        plt.plot(x,fit,'r',lw=2,label="Fit: $\mu=0$, $\sigma=4D_r\Delta t={0:7.3f}$".format(sigma_fit))
+    if System.cell_tumble and not System.cell_rbm:
+        x=np.linspace(0,180,num=100)
+        mu_fit = 68
+        sigma_fit = 36
+        fit=ss.norm.pdf(x,mu_fit,sigma_fit)
+        plt.plot(x,fit,'r',lw=2,label="Fit: $\mu={0:7.3f}$, $\sigma={1:7.3f}$".format(mu_fit,sigma_fit))
     plt.ylabel('Probability density')
     plt.xlabel('Angular deviation between adjacent timesteps (deg)')
     plt.legend()
