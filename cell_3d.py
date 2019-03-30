@@ -192,10 +192,11 @@ class Cell3D:
             
         if enable_rbm:
             rbm_angle = self.rot_brownian_motion(rot_diffusion_constant, time_step)
-            self.rbm_angdev += rbm_angle
-            angle = rbm_angle
         else:
-            angle = 0.0
+            rbm_angle = 0.0
+            
+        self.rbm_angdev += rbm_angle
+        angle = rbm_angle
 
         # Perform tumble if dice roll successful
         if (np.random.random() < self.tumble_chance) and (enable_tumble):
