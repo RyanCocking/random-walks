@@ -199,7 +199,7 @@ class Cell3D:
 
         # Perform tumble if dice roll successful
         if (np.random.random() < self.tumble_chance) and (enable_tumble):
-            angle = self.tumble(np.deg2rad(68),0.25*np.pi)  # Spread of distribution may need adjusting here
+            angle = self.tumble(np.deg2rad(68),np.deg2rad(36))  # distribution from Berg & Brown 1972
             self.tumble_angles.append(angle)
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
