@@ -63,18 +63,20 @@ if System.cell_run and System.cell_tumble:
 #if System.cell_rbm or System.cell_tumble:
     #ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
     #plt.hist(ang, bins='auto', density=True, edgecolor='black')
-    #x=np.linspace(-20,20,num=100)
-    #fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
+    ##x=np.linspace(-20,20,num=100)
+    ##fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
     #title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
     #title_dr+="$s^{-1}$"
     #plt.title(title_dr)
-    #plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
-    #plt.xlim(0,16)
+    ##plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
+    #plt.yscale('log')
     #plt.ylabel('Probability density')
     #plt.xlabel('Angular deviation between adjacent timesteps (deg)')
     #plt.legend()
     #plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
     #plt.close()
+
+#quit()
 
 #----------------------------------------------------------------------------#
 #---------------------------------TRAJECTORIES-------------------------------#
@@ -124,13 +126,14 @@ IO.save_model(filename,[System.timesteps,x,y,z,r],["%.2f","%.6e","%.6e","%.6e","
     System.param_string)
 print('Done')
 
-# EXPERIMENT DATA
-print('Loading experimental trajectory from file...')
-tt, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
-xt = pos_track[:,0]
-yt = pos_track[:,1]
-zt = pos_track[:,2]
-print('Done')
+if System.run_expt:
+    # EXPERIMENT DATA
+    print('Loading experimental trajectory from file...')
+    tt, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
+    xt = pos_track[:,0]
+    yt = pos_track[:,1]
+    zt = pos_track[:,2]
+    print('Done')
 
 # TRAJECTORIES
 print('Plotting trajectories...')
@@ -138,11 +141,13 @@ print('Plotting trajectories...')
 fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
 fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
 
-# experiment
-fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
-fg.scatter([tt,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
-fg.scatter([tt,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
-fg.scatter([tt,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
+if System.run_expt:
+    # experiment
+    fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
+    fg.scatter([tt,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
+    fg.scatter([tt,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
+    fg.scatter([tt,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
+    
 print('Done')
 
 #----------------------------------------------------------------------------#
@@ -203,15 +208,15 @@ if System.run_delay_time:
     segments = np.linspace(1,len(tau), num=len(tau), endpoint=True, 
             dtype='int')  # width (in integer steps) of tau segments
     msq = Data.delay_time_loop([x,y,z,theta], segments, System.time_step) 
-    
-    # Experiment
-    tau_t = tt[1:-1]
-    segments = np.linspace(1, len(tau_t), num=len(tau_t), endpoint=True, dtype='int')
-    msqt = Data.delay_time_loop([xt,yt,zt], segments, tau_t[1]-tau_t[0])
-
     msq_r  = msq[0] + msq[1] + msq[2]
     msq_theta = msq[3]
-    msq_rt = msqt[0] + msqt[1] + msqt[2]
+    
+    if System.run_expt:
+        # Experiment
+        tau_t = tt[1:-1]
+        segments = np.linspace(1, len(tau_t), num=len(tau_t), endpoint=True, dtype='int')
+        msqt = Data.delay_time_loop([xt,yt,zt], segments, tau_t[1]-tau_t[0])
+        msq_rt = msqt[0] + msqt[1] + msqt[2]
 
     print('Done')
 
@@ -226,11 +231,12 @@ if System.run_delay_time:
     IO.save_model(filename,[tau,msq_theta],["%.2f","%.6e"],System.param_string)
     print('Done')
     
-    # Experiment
-    filename="ExptMeanSquare_r.txt"
-    print('Saving experiment mean square displacement data to {}...'.format(filename))
-    IO.save_model(filename,[tau_t,msq_rt],["%.2f","%.6e"])
-    print('Done')
+    if System.run_expt:
+        # Experiment
+        filename="ExptMeanSquare_r.txt"
+        print('Saving experiment mean square displacement data to {}...'.format(filename))
+        IO.save_model(filename,[tau_t,msq_rt],["%.2f","%.6e"])
+        print('Done')
 
     # DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
     print('Plotting graphs...')
@@ -260,15 +266,16 @@ if System.run_delay_time:
             title_d, tag='model_', fit=False, fitdata=[tau,fit_theta],
             fitlabel=r"$\langle \Theta^2 \rangle=4D_r\tau$",limx=[0,10])  # Theta
 
-    # Experiment
-    fg.scatter([tau_t,msq_rt],
-            ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            'tau_VS_msq_r_full', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
-            fitlabel="6Dt")  # r
-    fg.scatter([tau_t,msq_rt],
-            ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-            'tau_VS_msq_r_crop', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
-            fitlabel="6Dt", limx=[0,10])  # r
+    if System.run_expt:
+        # Experiment
+        fg.scatter([tau_t,msq_rt],
+                ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+                'tau_VS_msq_r_full', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
+                fitlabel="6Dt")  # r
+        fg.scatter([tau_t,msq_rt],
+                ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+                'tau_VS_msq_r_crop', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
+                fitlabel="6Dt", limx=[0,10])  # r
 
     # PROBABILITY DISTRIBUTIONS
     # brownian
