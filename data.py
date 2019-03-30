@@ -78,15 +78,20 @@ class Data:
         """
 
         N = coords.shape[0]-2
-        angles = np.zeros(N)
+        angles = np.zeros(N, dtype=np.float)
 
         for i in range(0, N):
             r1 = np.array(coords[i+1] - coords[i])
             r2 = np.array(coords[i+2] - coords[i+1])
             mag_r1 = np.abs(np.linalg.norm(r1))
             mag_r2 = np.abs(np.linalg.norm(r2))
-            angles[i] = np.arccos(np.dot(r1,r2)/(mag_r1*mag_r2))
-            
+            costheta = np.dot(r1,r2)/(mag_r1*mag_r2)            
+            # If statement to guard against any NaNs from arccos
+            if np.abs(costheta) < 1:
+                angles[i] = np.arccos(costheta)
+            else:
+                angles[i] = 0.0
+
         return angles
 
     def ang_corr(rhat, step_size):

@@ -60,23 +60,24 @@ if System.cell_run and System.cell_tumble:
     plt.savefig("RunDur{0:s}.png".format(System.file_id))
     plt.close()
 
-#if System.cell_rbm or System.cell_tumble:
-    #ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
-    #plt.hist(ang, bins='auto', density=True, edgecolor='black')
-    ##x=np.linspace(-20,20,num=100)
-    ##fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
-    #title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
-    #title_dr+="$s^{-1}$"
-    #plt.title(title_dr)
-    ##plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
-    #plt.yscale('log')
-    #plt.ylabel('Probability density')
-    #plt.xlabel('Angular deviation between adjacent timesteps (deg)')
-    #plt.legend()
-    #plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
-    #plt.close()
+if System.cell_rbm or System.cell_tumble:
+    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
+    ang=ang[np.where(ang>0.001)]  # remove negligible angles
+    plt.hist(ang, bins='auto', density=True, edgecolor='black')
+    title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
+    title_dr+="$s^{-1}$"
+    plt.title(title_dr)
+    if System.cell_rbm:
+        x=np.linspace(-20,20,num=100)
+        fit=2*ss.norm.pdf(x,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
+        plt.plot(x,fit,'r',lw=2,label=r"$P(\theta_{rbm},t)=\frac{2}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\theta_{rbm}^2}{8D_r\Delta t}}\right]$")
+    plt.ylabel('Probability density')
+    plt.xlabel('Angular deviation between adjacent timesteps (deg)')
+    plt.legend()
+    plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
+    plt.close()
 
-#quit()
+quit()
 
 #----------------------------------------------------------------------------#
 #---------------------------------TRAJECTORIES-------------------------------#
