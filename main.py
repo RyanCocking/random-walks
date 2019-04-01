@@ -247,11 +247,11 @@ if System.run_delay_time:
     fit_theta = 4*System.rot_diffusion_constant*tau
     fg.scatter([tau,msq_r],["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
             'tau_VS_msq_r_full'+System.file_id, title_d, tag='model_', fit=False, fitdata=[tau,fit_r],
-            fitlabel="6Dt")  # r
+            fitlabel=r"$6D\tau$")  # r
     fg.scatter([tau,msq_r],
             ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
             'tau_VS_msq_r_crop'+System.file_id, title_d, tag='model_', fit=False, fitdata=[tau,fit_r],
-            fitlabel="6Dt", limx=[0,10])  # r
+            fitlabel=r"$6D\tau$", limx=[0,10])  # r
     fg.scatter([tau,msq_theta],
             ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta_full'+System.file_id,
             title_d, tag='model_', fit=False, fitdata=[tau,fit_theta],

@@ -44,7 +44,7 @@ def scatter(data, axis_labels, dataname, title, tag="", final=True,
     x = data[0]
     y = data[1]
 
-    plt.plot(x, y, 'o', ms=0.5)
+    plt.plot(x, y, 'ko', ms=0.5, label="Model")
     plt.xlabel(axis_labels[0])
     plt.ylabel(axis_labels[1])
 
