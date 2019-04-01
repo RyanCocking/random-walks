@@ -73,26 +73,35 @@ class Data:
         dot product between the two displacement vectors produced by
         groups of three points, to produce an N-2 array of angles.
         
+        Also calculate a corresponding N-1 array of direction unit 
+        vectors, rhat.
+        
         coords is a 3*N array; an array with each element 
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
         """
 
-        N = coords.shape[0]-2
-        angles = np.zeros(N, dtype=np.float)
+        N = coords.shape[0]
+        angles = np.zeros(N-2, dtype=np.float)
+        rhat = np.zeros(N-1, dtype=np.object)
 
-        for i in range(0, N):
+        for i in range(0, N-2):
             r1 = np.array(coords[i+1] - coords[i])
             r2 = np.array(coords[i+2] - coords[i+1])
             mag_r1 = np.abs(np.linalg.norm(r1))
             mag_r2 = np.abs(np.linalg.norm(r2))
-            costheta = np.dot(r1,r2)/(mag_r1*mag_r2)            
+            costheta = np.dot(r1,r2) / (mag_r1 * mag_r2)            
+            
             # If statement to guard against any NaNs from arccos
             if np.abs(costheta) < 1:
                 angles[i] = np.arccos(costheta)
             else:
                 angles[i] = 0.0
+            
+            rhat[i] = r1 / mag_r1
+            
+        rhat[N-2] = r2 / mag_r2
 
-        return angles
+        return angles, rhat
 
     def ang_corr(rhat, step_size):
         """

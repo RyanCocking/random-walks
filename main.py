@@ -65,7 +65,7 @@ if System.cell_run and System.cell_tumble:
     plt.close()
 
 if System.cell_rbm or System.cell_tumble:
-    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history)))
+    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history))[0])
     ang=ang[np.where(ang>0.001)]  # remove negligible angles
     mu = np.mean(ang)
     sigma = np.std(ang)
@@ -131,7 +131,7 @@ y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.sqrt(np.square(x) + np.square(y) + np.square(z))
 theta = angles[0,:]
-rhat = directions[0,:]
+theta2, rhat = Data.compute_angles(positions[0])
 print('Done')
 
 # Save trajectory to file
@@ -140,6 +140,12 @@ print('Saving model trajectory to {}...'.format(filename))
 IO.save_model(filename,[System.timesteps,x,y,z,r],["%.2f","%.6e","%.6e","%.6e","%.6e"],
     System.param_string)
 print('Done')
+
+print('Plotting model trajectory...')
+# model
+fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
+fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
+print("Done")
 
 if System.run_expt:
     # EXPERIMENT DATA
@@ -150,20 +156,13 @@ if System.run_expt:
     zt = pos_track[:,2]
     print('Done')
 
-# TRAJECTORIES
-print('Plotting trajectories...')
-# model
-fg.trajectory(brownian_positions[0], System.box_size, System.title, tag='bm_')  # brownian
-fg.trajectory(positions[0], System.box_size, System.title, tag='model_')  # swimming & brownian
-
-if System.run_expt:
     # experiment
+    print("Printing experimental trajectory...")
     fg.trajectory(pos_track, System.box_size, System.title, tag='expt_')
     fg.scatter([tt,xt],["t (s)","x ($\mu m$)"],'t_vs_x',"",tag='expt_')
     fg.scatter([tt,yt],["t (s)","y ($\mu m$)"],'t_vs_y',"",tag='expt_')
-    fg.scatter([tt,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')
-    
-print('Done')
+    fg.scatter([tt,zt],["t (s)","z ($\mu m$)"],'t_vs_z',"",tag='expt_')    
+    print('Done')
 
 #----------------------------------------------------------------------------#
 #-----------------------------------ANALYSIS---------------------------------#
@@ -191,27 +190,14 @@ if System.run_ang_corr:
     plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau = 1/2D_r$")
     plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
     plt.plot(tau,cfit,color='r',label="exp($-2D_r\\tau$)")
-    #plt.plot(tau,chfit,color='b',label="exp($-D_r\\tau$)")
-    plt.plot(tau,angcorr,'k+',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
+    plt.plot(tau,chfit,color='b',label="exp($-D_r\\tau$)")
+    plt.plot(tau,angcorr,'k^',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
     plt.xscale('log')
     plt.xlabel("$\\tau$ (s)")
     plt.ylim(-0.2,1.0)
     plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
     plt.legend()
     plt.savefig("AngCorr{0:s}.png".format(System.file_id),dpi=400)
-    plt.close()
-
-    plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau_c = 1/2D_r = 3$s")
-    plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
-    plt.plot(tau,np.where(cfit<=1e-5,1e-5,cfit),color='r',label="exp($-2D_r\\tau$)")
-    #plt.plot(tau,np.where(chfit<=1e-5,1e-5,chfit),color='b',label="exp($-D_r\\tau$)")
-    plt.plot(tau,clog,'k+',ms=1,label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
-    plt.xlabel("$\\tau$ (s)")
-    plt.ylabel("$\langle \hat{r}(\\tau)\cdot \hat{r}(0)  \\rangle$")
-    plt.xlim(0,20)
-    plt.yscale('log')
-    plt.legend()
-    plt.savefig("AngCorrLog{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
 if System.run_delay_time:
