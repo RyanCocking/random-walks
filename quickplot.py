@@ -62,6 +62,17 @@ plt.legend()
 plt.savefig("QUICKPLOT_AngCorr{0:s}.png".format(System.file_id),dpi=400)
 plt.close()
 
+fig = plt.figure()
+ax3d = fig.add_subplot(111, projection='3d')
+ax3d.set_xlabel('x ($\mu$m)')
+ax3d.set_ylabel('y ($\mu$m)')
+ax3d.set_zlabel('z ($\mu$m)')
+ax3d.plot(x,y,z,lw=1,ms=1.2,color='k',marker='+',ls='-', label="Model")
+plt.tight_layout()
+plt.title(title_d)
+plt.savefig('QUICKPLOT_long3D.png',dpi=400)
+plt.close()
+
 # INCLUDING EXPERIMENTAL DATA
 
 # 3d trajectory
