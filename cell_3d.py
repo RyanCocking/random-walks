@@ -67,8 +67,8 @@ class Cell3D:
         self.velocity = self.speed * self.direction
         self.tumble_chance = tumble_chance  # probability per time step
         self.run_duration = 0
-        self.angdev = 0.0  # angular deviation (displacement)
-        self.rbm_angdev = 0.0
+        self.ang_disp = 0.0  # angular deviation (displacement)
+        self.rbm_ang_disp = 0.0
 
         self.swim_history = []
         self.swim_history.append(np.copy(self.swim_position))  # run & tumble
@@ -76,8 +76,8 @@ class Cell3D:
         self.brownian_history.append(np.copy(self.brownian_position))  # translational brownian motion
         self.combined_history = []
         self.combined_history.append(np.copy(self.swim_position)+np.copy(self.brownian_position))
-        self.rbm_angle_history = [0.0]  # angular deviation due to rotational brownian motion
-        self.angle_history = [0.0]  # ang. dev. due to both RBM and tumbles
+        self.rbm_ang_disp_history = [0.0]  # angular deviation due to rotational brownian motion
+        self.ang_disp_history = [0.0]  # ang. dev. due to both RBM and tumbles
         self.run_durations = []
         self.tumble_angles = []
         self.direction_history = []
@@ -195,7 +195,7 @@ class Cell3D:
         else:
             rbm_angle = 0.0
             
-        self.rbm_angdev += rbm_angle
+        self.rbm_ang_disp += rbm_angle
         angle = rbm_angle
 
         # Perform tumble if dice roll successful
@@ -205,12 +205,12 @@ class Cell3D:
             self.run_durations.append(self.run_duration)
             self.run_duration = 0
 
-        self.angdev += angle
+        self.ang_disp += angle
         
         # Append data to lists
         self.brownian_history.append(np.copy(self.brownian_position))  # TBM
         self.swim_history.append(np.copy(self.swim_position))  # Runs
         self.combined_history.append(np.copy(self.brownian_position)+np.copy(self.swim_position))  # TBM and runs
-        self.rbm_angle_history.append(self.rbm_angdev)  # RBM
-        self.angle_history.append(self.angdev)  # RBM and tumbles
+        self.rbm_ang_disp_history.append(self.rbm_ang_disp)  # RBM
+        self.ang_disp_history.append(self.ang_disp)  # RBM and tumbles
         self.direction_history.append(np.copy(self.direction))  # rhat
