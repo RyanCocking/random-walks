@@ -40,7 +40,7 @@ title_d+="$s^{-1}$"
 # MSD and MSAD
 fg.scatter([tau,msq_r],
     ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-    'tau_VS_msq_r_crop'+System.file_id, title_d, tag='QUICKPLOT_', fit=True, fitdata=[tau,fit_r],
+    'tau_VS_msq_r'+System.file_id, title_d, tag='QUICKPLOT_', fit=True, fitdata=[tau,fit_r],
     fitlabel=r"$6D\tau$", logx=True, logy=True, limy=[1e-2,1e7])  # r
 fg.scatter([tau,msq_theta],
     ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta_full'+System.file_id,
