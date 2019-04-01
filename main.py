@@ -102,21 +102,18 @@ if System.cell_rbm or System.cell_tumble:
 print('Extracting data from model...')
 brownian_positions = []
 positions = []
-rbm_angles= []
-angles = []
-directions = []
+rbm_ang_disp= []
+ang_disp = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))  # TBM
     positions.append(np.array(swimmer.combined_history))  # TBM and R&T
-    rbm_angles.append(np.array(swimmer.rbm_angle_history))  # RBM
-    angles.append(np.array(swimmer.angle_history))  # RBM and tumbles
-    directions.append(np.array(swimmer.direction_history))
+    rbm_ang_disp.append(np.array(swimmer.rbm_ang_disp_history))  # RBM
+    ang_disp.append(np.array(swimmer.ang_disp_history))  # RBM and tumbles
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
-rbm_angles = np.array(rbm_angles)
-angles = np.array(angles)
-directions = np.array(directions)
+rbm_angles = np.array(rbm_ang_disp)
+angles = np.array(ang_disp)
 
 # MODEL DATA
 # brownian
@@ -131,7 +128,7 @@ y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.sqrt(np.square(x) + np.square(y) + np.square(z))
 theta = angles[0,:]
-theta2, rhat = Data.compute_angles(positions[0])
+rhat = Data.compute_angles(positions[0])[1]
 print('Done')
 
 # Save trajectory to file
@@ -182,7 +179,6 @@ if System.run_ang_corr:
     print('Done')
 
     cfit = np.exp(-2.0 * System.rot_diffusion_constant * tau)
-    chfit = np.exp(-System.rot_diffusion_constant * tau)
     clog = np.where(angcorr<=0, 1e-5, angcorr)
     tc = 1.0/(2.0 * System.rot_diffusion_constant)
     cc = 0.333
@@ -190,8 +186,7 @@ if System.run_ang_corr:
     plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau = 1/2D_r$")
     plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
     plt.plot(tau,cfit,color='r',label="exp($-2D_r\\tau$)")
-    plt.plot(tau,chfit,color='b',label="exp($-D_r\\tau$)")
-    plt.plot(tau,angcorr,'k^',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
+    plt.plot(tau,angcorr,'k+',ms=1, label="Model, $D_r={:5.4f} rad^2$/sec".format(System.rot_diffusion_constant))
     plt.xscale('log')
     plt.xlabel("$\\tau$ (s)")
     plt.ylim(-0.2,1.0)
@@ -250,8 +245,7 @@ if System.run_delay_time:
     fit_xyz = 2*System.diffusion_constant*tau
     fit_r = 6*System.diffusion_constant*tau
     fit_theta = 4*System.rot_diffusion_constant*tau
-    fg.scatter([tau,msq_r],
-            ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
+    fg.scatter([tau,msq_r],["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
             'tau_VS_msq_r_full'+System.file_id, title_d, tag='model_', fit=False, fitdata=[tau,fit_r],
             fitlabel="6Dt")  # r
     fg.scatter([tau,msq_r],
