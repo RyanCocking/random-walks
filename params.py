@@ -7,13 +7,13 @@ class System:
     boltz=1.38064852e-23  # J/k
    
     # Time (s)
-    max_time = 200.0
+    max_time = 23.78
     time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
    
     # System parameters
-    box_size = 1000      # mu
+    box_size = 1000      # mu (has no effect on simulation)
     temperature = 300.0  # K
     viscosity = 0.01     # g/cm s (1 g/cm s = 1 Poise = 0.1 kg/m s)
     cell_radius = 1.0    # mu
@@ -32,13 +32,13 @@ class System:
 
     # Simulation flags
     cell_run = True
-    cell_tumble = True
-    cell_tbm = True
+    cell_tumble = False
+    cell_tbm = False
     cell_rbm = True
     
     # Data analysis flags
-    run_expt = False
-    run_ang_corr = True
+    run_expt = True
+    run_ang_corr = False
     run_delay_time = True
 
     # Graph header
