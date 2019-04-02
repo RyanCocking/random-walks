@@ -40,7 +40,7 @@ class System:
     # Data analysis flags
     run_expt = False
     run_ang_corr = True
-    run_delay_time = True
+    run_delay_time = False
 
     # Graph header
     title = "tmax={}s, t={}s, seed={}".format(max_time, time_step, seed)
@@ -53,7 +53,7 @@ class System:
     mean_run_dur, tumble_prob, str(cell_run), str(cell_tumble), str(cell_tbm), str(cell_rbm))
 
     # Simulation name
-    sim_name = "test-"
+    sim_name = ""
     if cell_run:
         sim_name += "Run-"
     if cell_tumble:
