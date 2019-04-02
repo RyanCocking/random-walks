@@ -65,7 +65,7 @@ if System.cell_run and System.cell_tumble:
     plt.close()
 
 if System.cell_rbm or System.cell_tumble:
-    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.swim_history))[0])
+    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.combined_history))[0])
     ang=ang[np.where(ang>0.001)]  # remove negligible angles
     mu = np.mean(ang)
     sigma = np.std(ang)
