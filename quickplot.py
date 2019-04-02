@@ -5,7 +5,7 @@ import numpy as np
 import figures as fg
 from params import System
 
-# model data
+# swim data
 data_r = np.loadtxt("ModelMeanSquare_r_test-Run-Tumble-TBM-RBM_1000s.txt")
 data_th = np.loadtxt("ModelMeanSquare_theta_test-Run-Tumble-TBM-RBM_1000s.txt")
 data_ac = np.loadtxt("AngCorr_test-Run-Tumble-TBM-RBM_1000s.txt")
@@ -19,6 +19,15 @@ x = traj[:,1]
 y = traj[:,2]
 z = traj[:,3]
 
+# brownian data
+data_r_bm = np.loadtxt("ModelMeanSquare_r_test-TBM-RBM_1000s.txt")
+data_th_bm = np.loadtxt("ModelMeanSquare_theta_test-TBM-RBM_1000s.txt")
+#data_ac_bm = 
+
+msq_r_bm = data_r_bm[:,1]
+msq_theta_bm = data_th_bm[:,1]
+#angcorr_bm = data_ac_bm[:,1]
+
 # experiment data
 data_expt = np.loadtxt("ExptMeanSquare_r.txt")
 track_expt=np.loadtxt("tracks/track34sm.txt")
@@ -30,6 +39,7 @@ rsqt=data_expt[:,1]
 
 fit_r = 6 * System.diffusion_constant * tau
 fit_theta = 4 * System.rot_diffusion_constant * tau
+fit_swim = 6 * System.swim_diffusion_constant * tau
 
 # title
 title_d=System.title+", $D={:6.4f}\mu m^2$".format(System.diffusion_constant)
@@ -38,20 +48,65 @@ title_d+=", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
 title_d+="$s^{-1}$"
 
 # MSD and MSAD
-fg.scatter([tau,msq_r],
-    ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
-    'tau_VS_msq_r'+System.file_id, title_d, tag='QUICKPLOT_', fit=True, fitdata=[tau,fit_r],
-    fitlabel=r"$6D\tau$", logx=True, logy=True, limy=[1e-2,1e7])  # r
-fg.scatter([tau,msq_theta],
-    ["$\\tau$ (s)","$\langle \\Theta^2_{\\tau} \\rangle$ $(rad^2)$"],'tau_VS_msq_theta_full'+System.file_id,
-    title_d, tag='QUICKPLOT_', fit=True, fitdata=[tau,fit_theta],
-    fitlabel=r"$4D_r\tau$", logx=True, logy=True, limy=[1e-2,1e7])  # Theta
+
+# MSD - Full range
+plt.figure()
+plt.title(System.title)
+plt.plot(tau,msq_r,markeredgecolor='k',markerfacecolor='none',ls='none',ms=4,marker='^',label="Swimming")
+plt.plot(tau,fit_swim,color='g',lw=2,ls='--',label="$6[D_{TBM}+D_{swim}]\\tau$")
+plt.plot(tau,msq_r_bm,markeredgecolor='b',markerfacecolor='none',ls='none',ms=4,marker='o',label="Brownian")
+plt.plot(tau,fit_r,color='r',lw=2,ls='--',label="$6D_{TBM}\\tau$")
+plt.xlim(tau[0],tau[-1])
+plt.ylim(1e-2,1e7)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel("$\\tau$ (s)")
+plt.ylabel("MSD ($\mu m^2$)")
+plt.legend()
+plt.savefig("MeansquareDisp.png",dpi=400)
+plt.close()
+
+# MSD - Experiment
+plt.figure()
+plt.title(System.title)
+plt.plot(tau,msq_r,markeredgecolor='k',markerfacecolor='none',ls='none',ms=4,marker='^',label="Swimming")
+plt.plot(tau,fit_swim,color='g',lw=2,ls='--',label="$6[D_{TBM}+D_{swim}]\\tau$")
+plt.plot(tau,msq_r_bm,markeredgecolor='b',markerfacecolor='none',ls='none',ms=4,marker='o',label="Brownian")
+plt.plot(tau,fit_r,color='r',lw=2,ls='--',label="$6D_{TBM}\\tau$")
+plt.plot(taue,rsqt,markeredgecolor='magenta',markerfacecolor='none',ls='none',ms=4,marker='D',label="Experiment")
+plt.xlim(tau[0],tau[-1])
+plt.ylim(1e-2,1e7)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel("$\\tau$ (s)")
+plt.ylabel("MSD ($\mu m^2$)")
+plt.legend()
+plt.savefig("MeansquareExptDisp.png",dpi=400)
+plt.close()
+
+# MSAD - Full range
+plt.figure()
+plt.title(System.title)
+plt.plot(tau,msq_theta,markeredgecolor='k',markerfacecolor='none',ls='none',ms=4,marker='^',label="Swimming")
+plt.plot(tau,msq_theta_bm,markeredgecolor='b',markerfacecolor='none',ls='none',ms=4,marker='o',label="Brownian")
+plt.plot(tau,fit_theta,color='r',lw=2,ls='--',label="$4D_{r}\\tau$")
+plt.xlim(tau[0],tau[-1])
+plt.ylim(1e-2,1e7)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel("$\\tau$ (s)")
+plt.ylabel("MSAD ($rad^2$)")
+plt.legend()
+plt.savefig("MeansquareAngular.png",dpi=400)
+plt.close()
+
+angcorr=angcorr[:-1]
 
 # angular correlation
 cfit = np.exp(-2.0 * System.rot_diffusion_constant * tau)
 plt.title(title_d)
 plt.plot(tau,cfit,color='r',lw=1,ls='--',label="exp($-2D_r\\tau$)")
-plt.plot(tau,angcorr[:-1],'k+',ms=1, label="Model")
+plt.plot(tau,angcorr,'k+',ms=1, label="Model")
 plt.plot([tau[0],tau[-1]],[0,0],'k--',lw=0.5)
 plt.xlim(tau[0],tau[-1])
 plt.xscale('log')
