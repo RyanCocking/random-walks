@@ -74,7 +74,7 @@ class Data:
         groups of three points, to produce an N-2 array of angles.
         
         Also calculate a corresponding N-1 array of direction unit 
-        vectors, rhat.
+        vectors, rhat (only valid for a running cell).
         
         coords is a 3*N array; an array with each element 
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
