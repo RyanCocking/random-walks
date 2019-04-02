@@ -7,7 +7,7 @@ class System:
     boltz=1.38064852e-23  # J/k
    
     # Time (s)
-    max_time = 23.78
+    max_time = 1000.0
     time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -24,6 +24,7 @@ class System:
     # Diffusion constants (Stokes-Einstein equation)
     diffusion_constant = (boltz*temperature)/(6.0*np.pi*0.1*viscosity*1e-6*cell_radius)  # m^2/s
     diffusion_constant *= 1e12   # mu^2/s
+    swim_diffusion_constant = diffusion_constant + (mean_speed**2 * mean_run_dur / 3.0) # mu^2/s, valid at large times (Lauga paper)
     rot_diffusion_constant = (boltz*temperature)/(8.0*np.pi*0.1*viscosity*(1e-6*cell_radius)**3)  # rad^2/s
 
     # Random number seed
@@ -31,14 +32,14 @@ class System:
     np.random.seed(seed)
 
     # Simulation flags
-    cell_run = True
+    cell_run = False
     cell_tumble = False
-    cell_tbm = False
+    cell_tbm = True
     cell_rbm = True
     
     # Data analysis flags
-    run_expt = True
-    run_ang_corr = False
+    run_expt = False
+    run_ang_corr = True
     run_delay_time = True
 
     # Graph header
