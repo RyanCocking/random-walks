@@ -74,7 +74,9 @@ class Data:
         groups of three points, to produce an N-2 array of angles.
         
         Also calculate a corresponding N-1 array of direction unit 
-        vectors, rhat (only valid for a running cell).
+        vectors, rhat (currently only works for a running cell, since
+        a translational Brownian trajectory is independent of any rotational
+        Brownian motion).
         
         coords is a 3*N array; an array with each element 
         containing an x,y,z coordinate, i.e. coords[0][0] = x(0).
@@ -89,17 +91,25 @@ class Data:
             r2 = np.array(coords[i+2] - coords[i+1])
             mag_r1 = np.abs(np.linalg.norm(r1))
             mag_r2 = np.abs(np.linalg.norm(r2))
-            costheta = np.dot(r1,r2) / (mag_r1 * mag_r2)            
+            
+            # Guard against zero vectors
+            if mag_r1 > 0 and mag_r2 > 0:
+                costheta = np.dot(r1,r2) / (mag_r1 * mag_r2)
+                rhat[i] = r1 / mag_r1
+            else:
+                costheta = 0
+                rhat[i] = rhat[i-1]
             
             # If statement to guard against any NaNs from arccos
             if np.abs(costheta) < 1:
                 angles[i] = np.arccos(costheta)
             else:
                 angles[i] = 0.0
-            
-            rhat[i] = r1 / mag_r1
-            
-        rhat[N-2] = r2 / mag_r2
+
+        if mag_r2 > 0:
+            rhat[N-2] = r2 / mag_r2
+        else:
+            rhat[N-2] = rhat[N-1]
 
         return angles, rhat
 

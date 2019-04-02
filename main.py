@@ -102,18 +102,21 @@ if System.cell_rbm or System.cell_tumble:
 print('Extracting data from model...')
 brownian_positions = []
 positions = []
-rbm_ang_disp= []
+rbm_ang_disp = []
 ang_disp = []
+directions = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))  # TBM
     positions.append(np.array(swimmer.combined_history))  # TBM and R&T
     rbm_ang_disp.append(np.array(swimmer.rbm_ang_disp_history))  # RBM
     ang_disp.append(np.array(swimmer.ang_disp_history))  # RBM and tumbles
+    directions.append(np.array(swimmer.direction_history))  # unit vectors
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
-rbm_angles = np.array(rbm_ang_disp)
-angles = np.array(ang_disp)
+rbm_ang_disp = np.array(rbm_ang_disp)
+ang_disp = np.array(ang_disp)
+directions = np.array(directions)
 
 # MODEL DATA
 # brownian
@@ -121,14 +124,14 @@ xb = brownian_positions[0,:,0]
 yb = brownian_positions[0,:,1]
 zb = brownian_positions[0,:,2]
 rb = np.sqrt(np.square(xb) + np.square(yb) + np.square(zb))
-thetab = rbm_angles[0,:]
+thetab = rbm_ang_disp[0,:]
 # swimming & brownian
 x = positions[0,:,0]
 y = positions[0,:,1]
 z = positions[0,:,2]
 r = np.sqrt(np.square(x) + np.square(y) + np.square(z))
-theta = angles[0,:]
-rhat = Data.compute_angles(positions[0])[1]
+theta = ang_disp[0,:]
+rhat = directions[0,:]
 print('Done')
 
 # Save trajectory to file
@@ -151,6 +154,7 @@ if System.run_expt:
     xt = pos_track[:,0]
     yt = pos_track[:,1]
     zt = pos_track[:,2]
+    rhatt = Data.compute_angles(pos_track)[1]
     print('Done')
 
     # experiment
@@ -168,15 +172,27 @@ if System.run_expt:
 if System.run_ang_corr:
 
     # Angular correlation
-    print("Computing angular correlation...")
+    print("Computing model angular correlation...")
     tau, angcorr = Data.ang_corr(rhat,System.time_step)
     print("Done")
 
     # Save ang. corr. data to file
     filename="AngCorr{0:s}.txt".format(System.file_id)
-    print('Saving angular correlation data to {}...'.format(filename))
+    print('Saving model angular correlation data to {}...'.format(filename))
     IO.save_model(filename,[tau,angcorr],["%.2f","%.6e"],System.param_string)
     print('Done')
+    
+    if System.run_expt:
+        # Angular correlation
+        print("Computing experiment angular correlation...")
+        tau_t, angcorrt = Data.ang_corr(rhatt,System.time_step)
+        print("Done")
+        
+        # Save to file
+        filename="ExptAngCorr.txt"
+        print('Saving experimental angular correlation data to {}...'.format(filename))
+        IO.save_model(filename,[tau_t,angcorrt],["%.2f","%.6e"],"Experiment")
+        print('Done')
 
     cfit = np.exp(-2.0 * System.rot_diffusion_constant * tau)
     clog = np.where(angcorr<=0, 1e-5, angcorr)
