@@ -1,1 +1,0 @@
-Run using paramters similar to that of E.coli, taken from Berg & Brown's 1972 paper. See notebook p71-73.
