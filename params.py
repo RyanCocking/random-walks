@@ -1,3 +1,24 @@
+"""
+RandomWalks - A code to simulate run-and-tumble swimming and Brownian motion
+    
+Copyright (C) 2018-2019  R.C.T.B. Cocking
+
+Email: ry.ctbc@gmail.com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+"""
+
 # Parameters file
 import numpy as np
 
@@ -32,15 +53,15 @@ class System:
     np.random.seed(seed)
 
     # Simulation flags
-    cell_run = False
+    cell_run = True
     cell_tumble = False
-    cell_tbm = True
+    cell_tbm = False
     cell_rbm = True
     
     # Data analysis flags
     run_expt = False
-    run_ang_corr = True
-    run_delay_time = False
+    run_ang_corr = False
+    run_delay_time = True
 
     # Graph header
     title = "tmax={}s, t={}s, seed={}".format(max_time, time_step, seed)
