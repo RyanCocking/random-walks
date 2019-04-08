@@ -1,9 +1,9 @@
 """
 RandomWalks - A code to simulate run-and-tumble swimming and Brownian motion
     
-Copyright (C) 2018-2019  R.C.T.B. Cocking
+Copyright (C) 2019  R.C.T.B. Cocking
 
-Email: ry.ctbc@gmail.com
+Email: rctc500@york.ac.uk
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ class System:
     cell_run = True
     cell_tumble = False
     cell_tbm = False
-    cell_rbm = True
+    cell_rbm = False
     
     # Data analysis flags
     run_expt = False
