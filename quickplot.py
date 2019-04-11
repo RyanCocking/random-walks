@@ -1,15 +1,193 @@
 # For plotting things outside of main file
 
+import re
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import figures as fg
 from params import System
 
+def msq_options(xlbl, ylbl, xmin=1e-2, xmax=1e3, ymin=1e-1, ymax=1e7, xs="log", ys="log"):
+    
+    plt.xlabel(xlbl)
+    plt.ylabel(ylbl)
+    
+    plt.xlim(xmin, xmax)
+    plt.ylim(ymin, ymax)
+    
+    plt.xscale(xs)
+    plt.yscale(ys)
+    
+    plt.legend()
+    
+    return 0
+
+def gen_fit(const, time):
+    return np.array(const*time)
+
+def decide_color(name, colors, extra_color):
+    if re.findall("Run",name) and not re.findall("Tum",name) and not re.findall("TBM",name):
+        return colors[0]
+    elif re.findall("RunTum",name) and not re.findall("TBM",name):
+        return colors[1]
+    elif re.findall("RunTumTBM",name) or re.findall("All",name):
+        return colors[2]
+    elif re.findall("RunTBM",name):
+        return colors[3]
+    else:
+        return extra_color
+
+def separate_files(name, rbm_list, norbm_list):
+    if re.findall("RBM",name) or re.findall("All",name):
+        if re.findall("Run",name) and not re.findall("Tum",name) and not re.findall("TBM",name):
+            rbm_list[0] = name
+        elif re.findall("RunTum",name) and not re.findall("TBM",name):
+            rbm_list[1] = name
+        elif re.findall("RunTumTBM",name) or re.findall("All",name):
+            rbm_list[2] = name
+        elif re.findall("RunTBM",name):
+            rbm_list[3] = name
+    else:
+        if re.findall("Run",name) and not re.findall("Tum",name) and not re.findall("TBM",name):
+            norbm_list[0] = name
+        elif re.findall("RunTum",name) and not re.findall("TBM",name):
+            norbm_list[1] = name
+        elif re.findall("RunTumTBM",name):
+            norbm_list[2] = name
+        elif re.findall("RunTBM",name):
+            norbm_list[3] = name
+
+# Shorthand parameters
+Dkt = System.diffusion_constant 
+Dswim = System.swim_diffusion_constant
+Dr = System.rot_diffusion_constant
+lt = System.tumble_prob
+v = System.mean_speed
+
+folder = "results/lt={:s}/".format(str(lt))
+labels = glob.glob(folder+"*")
+for i,label in enumerate(labels,0):
+    labels[i] = label[len(folder)+8:]
+    if labels[i]=="TBMRBM":
+        labels[i]="Brownian"
+
+t_expt  = np.loadtxt("results/ExptMeanSquare_r.txt")[:,0]
+r2_expt = np.loadtxt("results/ExptMeanSquare_r.txt")[:,1]
+
+msd_files  = glob.glob(folder+"*/ModelMeanSquare_r*")
+#msad_files = glob.glob(folder+"*/ModelMeanSquare_theta*")
+
+units_mu="$\mu m^2 s^{-1}$"
+units_rad="$rad^2 s^{-1}$"
+
+title = "$D_{TBM}=$"+"{:5.4f} ".format(Dkt)+units_mu+", $D_{swim}=$"+"{:5.4f} ".format(Dswim)+units_mu+", $D_r=$"+"{:5.4f} ".format(Dr)+units_rad+", $\lambda_T=$"+"{:5.4f}".format(lt)
+title = ""
+
+# darker
+#colors=['#84009b','#c1a700','#ea0000','#00a508']  # [m,y,r,g]
+#bm_color='#004b8e'  # blue
+expt_color='#ff6a00'  # orange
+
+# lighter
+colors=['#de3fff','#ffee00','#ea0000','#2eff00']  # [m,y,r,g]
+bm_color='#3f88ff'  # blue
+
+run_fit_label="$\langle r_{run}^2 \\rangle = \langle v \\rangle^2 \\tau^2$"
+bm_fit_label="$\langle r_{brown}^2 \\rangle = 6D_{TBM}\\tau$"
+swim_fit_label="$\langle r_{swim}^2 \\rangle = 6D_{swim}\\tau$"
+
+plt.figure(figsize=(6,8))
+plt.title(title)
+
+# Plot MSD mean-square displacements THAT CONTAIN RBM
+j=0
+for i,filename in enumerate(msd_files,0):
+    mylabel = labels[i]
+    mycolor = decide_color(mylabel, colors, bm_color)
+    
+    data = np.loadtxt(filename)
+    t = data[:,0]
+    msq_r = data[:,1]
+    
+    if re.findall("RBM",mylabel) or re.findall("All",mylabel) or re.findall("Brownian",mylabel):
+        plt.plot(t, msq_r, label=mylabel,lw=3,ls='-',color=mycolor)
+ 
+r2_run_fit = gen_fit(v**2,np.square(t))
+r2_bm_fit = gen_fit(6*Dkt, t)
+r2_swim_fit = gen_fit(6*Dswim, t)
+
+plt.plot(t_expt, r2_expt, label="Experiment_24s", lw=3, ls='--', color=expt_color)
+
+plt.plot(t, r2_run_fit, label=run_fit_label, lw=2, ls='--',color='k')
+plt.plot(t, r2_bm_fit, label=bm_fit_label, lw=2, ls=':',color='k')
+plt.plot(t, r2_swim_fit, label=swim_fit_label, lw=2, ls='-.',color='k')
+
+msq_options("$\\tau$ (s)","$\langle r^2 \\rangle (\mu m^2)$")
+#plt.show()
+plt.savefig('MeanSquarePlot_r_RBM.png',dpi=400)
+plt.close()
+
+# ====================
+
+plt.figure(figsize=(6,8))
+plt.title(title)
+
+# Plot MSD mean-square displacements THAT DO NOT CONTAIN RBM
+j=0
+for i,filename in enumerate(msd_files,0):
+    mylabel = labels[i]
+    mycolor = decide_color(mylabel, colors, bm_color)
+    data = np.loadtxt(filename)
+    t = data[:,0]
+    msq_r = data[:,1]
+
+    if not re.findall("RBM",mylabel) and not re.findall("All",mylabel):
+        plt.plot(t, msq_r, label=mylabel,lw=3,ls='-',color=mycolor)
+
+ 
+ 
+plt.plot(t_expt, r2_expt, label="Experiment_34s", lw=3, ls='--', color=expt_color)
+
+plt.plot(t, r2_run_fit, label=run_fit_label, lw=2, ls='--',color='k')
+plt.plot(t, r2_bm_fit, label=bm_fit_label, lw=2, ls=':',color='k')
+plt.plot(t, r2_swim_fit, label=swim_fit_label, lw=2, ls='-.',color='k')
+
+msq_options("$\\tau$ (s)","$\langle r^2 \\rangle (\mu m^2)$")
+#plt.show()
+plt.savefig('MeanSquarePlot_r.png')
+plt.close()
+
+rbm_list=np.array(['s','y','x','f'],dtype='object')
+norbm_list=np.copy(rbm_list)
+
+for path in msd_files:
+    separate_files(path,rbm_list,norbm_list)
+
+labels = ["Run","RunTum","RunTumTBM","RunTBM"]
+
+plt.figure(figsize=(6,6))
+plt.title(title)
+
+for i in range(0,4):
+    d1 = np.loadtxt(rbm_list[i])
+    d2 = np.loadtxt(norbm_list[i])
+    mycolor = decide_color(norbm_list[i], colors, bm_color)
+    t  = d1[:,0]
+    r1 = d1[:,1]
+    r2 = d2[:,1]
+    ratio = np.divide(r1,r2) # rbm:no rbm
+    plt.plot(t,ratio,label=labels[i],color=mycolor,lw=3,ls='-')
+    
+msq_options("$\\tau$ (s)", "$Q_{MSD}$", xmin=1e-2, xmax=1e3, ymin=1e-3, ymax=1e0, xs="log", ys="log")
+plt.legend()
+plt.savefig("MeanSquarePlot_Ratio_r.png",dpi=400)
+quit()
+
 # swim data
-data_r = np.loadtxt("ModelMeanSquare_r_test-Run-Tumble-TBM-RBM_1000s.txt")
-data_th = np.loadtxt("ModelMeanSquare_theta_test-Run-Tumble-TBM-RBM_1000s.txt")
-data_ac = np.loadtxt("AngCorr_test-Run-Tumble-TBM-RBM_1000s.txt")
-traj = np.loadtxt("ModelTraj_test-Run-Tumble-TBM-RBM_1000s.txt")
+data_r = np.loadtxt("ModelMeanSquare_r_Run-Tumble-TBM-RBM_1000s.txt")
+data_th = np.loadtxt("ModelMeanSquare_theta_Run-Tumble-TBM-RBM_1000s.txt")
+data_ac = np.loadtxt("AngCorr_Run-Tumble-TBM-RBM_1000s.txt")
+traj = np.loadtxt("ModelTraj_Run-Tumble-TBM-RBM_1000s.txt")
 
 tau = data_r[:,0]
 msq_r = data_r[:,1]
@@ -20,8 +198,8 @@ y = traj[:,2]
 z = traj[:,3]
 
 # brownian data
-data_r_bm = np.loadtxt("ModelMeanSquare_r_test-TBM-RBM_1000s.txt")
-data_th_bm = np.loadtxt("ModelMeanSquare_theta_test-TBM-RBM_1000s.txt")
+data_r_bm = np.loadtxt("ModelMeanSquare_r_TBM-RBM_1000s.txt")
+data_th_bm = np.loadtxt("ModelMeanSquare_theta_TBM-RBM_1000s.txt")
 #data_ac_bm = 
 
 msq_r_bm = data_r_bm[:,1]
