@@ -42,6 +42,7 @@ class Data:
         N = len(data) - segment_size  # Number of segment moves
         segment_data = np.zeros(N)
 
+        # loop over (timesteps-1) - delay time segment size (size = tau/dt)
         for i in range(0,N):
             segment_data[i] = data[i+segment_size] - data[i]
         
@@ -49,8 +50,9 @@ class Data:
         #mean = np.mean(segment_data,axis=0)
         meansq = np.mean(np.square(segment_data),axis=0)
         #rms = Data.root_mean_square(segment_data)
+        
 
-        return meansq, delay_time
+        return meansq, delay_time, j
 
     def delay_time_loop(datasets,step_segments,step_size):
         """Apply the delay time averaging method to an arbitrary number
@@ -62,12 +64,21 @@ class Data:
         
         Three python lists are returned: the means, mean squares and root mean
         squares, in the same order that their origin datasets were passed
-        into this function."""
+        into this function.
+        
+        NOTE: This function needs rewriting as a single loop, to make it 
+        clear what is being looped over, and by how much. The algorithmic
+        complexity of the full process is 0.5*N(N+1), where N is the number
+        of timesteps - 1 (i.e. [tmax/dt] - 1).
+        
+        
+        """
     
         #segmented_data_list = []
         #mean_list = []
         meansq_list  = []
         #rms_list  = []
+        
 
         for data in datasets:
             #segmented_data = []
@@ -75,6 +86,7 @@ class Data:
             meansq = np.zeros(len(step_segments))
             #rms = np.copy(mean)
     
+            # loop over timesteps - 1
             for i,segment in enumerate(step_segments,0):
                 #sd, mean[i], meansq[i], rms[i], tau = Data.delay_time(data,
                         #segment, step_size)
