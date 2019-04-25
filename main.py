@@ -126,18 +126,21 @@ positions = []
 rbm_ang_disp = []
 ang_disp = []
 directions = []
+run_durations = []
 for swimmer in swimmers:
     brownian_positions.append(np.array(swimmer.brownian_history))  # TBM
     positions.append(np.array(swimmer.combined_history))  # TBM and R&T
     rbm_ang_disp.append(np.array(swimmer.rbm_ang_disp_history))  # RBM
     ang_disp.append(np.array(swimmer.ang_disp_history))  # RBM and tumbles
     directions.append(np.array(swimmer.direction_history))  # unit vectors
+    run_durations.append(np.array(swimmer.run_durations))  # run durations
 
 brownian_positions = np.array(brownian_positions)
 positions = np.array(positions)
 rbm_ang_disp = np.array(rbm_ang_disp)
 ang_disp = np.array(ang_disp)
 directions = np.array(directions)
+run_durations = np.array(run_durations)
 
 # MODEL DATA
 # brownian
@@ -153,6 +156,12 @@ z = positions[0,:,2]
 r = np.sqrt(np.square(x) + np.square(y) + np.square(z))
 theta = ang_disp[0,:]
 rhat = directions[0,:]
+print('Done')
+
+# Save run durations to file
+filename="RunDurations{0:s}.txt".format(System.file_id)
+print('Saving run durations to {}...'.format(filename))
+IO.save_model(filename,run_durations,"%.2f",System.param_string)
 print('Done')
 
 # Save trajectory to file

@@ -272,20 +272,18 @@ box=35
 # 3D
 fig=plt.figure(figsize=(8,8))
 ax3d = fig.add_subplot(111, projection='3d')
-ax3d.set_xlabel('x ($\mu$m)')
-ax3d.set_ylabel('y ($\mu$m)')
-ax3d.set_zlabel('z ($\mu$m)')
+ax3d.set_xlabel('\n x ($\mu$m)', linespacing=3.2)
+ax3d.set_ylabel('\n y ($\mu$m)', linespacing=3.2)
+ax3d.set_zlabel('\n z ($\mu$m)', linespacing=3.2)
 ax3d.plot(x,y,z,'bo',ms=0.5)
 plt.tight_layout()
 plt.savefig('XYZ_3D_Brownian.png',dpi=400)
 plt.close()
 # xy
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
 plt.plot(x,y,'bo',ms=0.5)
+plt.plot(x[0],y[0],'kx',ms=15, label="Origin")
+plt.plot(x[0],y[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('x ($\mu$m)')
 plt.ylabel('y ($\mu$m)')
 plt.tight_layout
@@ -293,11 +291,9 @@ plt.savefig("XY_Brownian.png",dpi=400)
 plt.close()
 # yz
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
 plt.plot(y,z,'bo',ms=0.5)
+plt.plot(y[0],z[0],'kx',ms=15, label="Origin")
+plt.plot(y[0],z[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('y ($\mu$m)')
 plt.ylabel('z ($\mu$m)')
 plt.tight_layout
@@ -306,11 +302,9 @@ plt.close()
 
 # xz
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
 plt.plot(x,z,'bo',ms=0.5)
+plt.plot(x[0],z[0],'kx',ms=15, label="Origin")
+plt.plot(x[0],z[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('x ($\mu$m)')
 plt.ylabel('z ($\mu$m)')
 plt.tight_layout
@@ -324,67 +318,118 @@ x=xyz_cell[:,1]
 y=xyz_cell[:,2]
 z=xyz_cell[:,3]
 
-box=800
-boxxmax=700
-boxxmin=-200
-boxymax=200
-boxymin=-900
-boxzmax=300
-boxzmin=-400
+run_durations = np.loadtxt("RunDurations_Run-Tumble-TBM-RBM_200s.txt")
+tumble_times=np.cumsum(run_durations)
+tumble_index=np.divide(tumble_times,System.time_step).astype('int32')-1
+num_tumbles=tumble_times.size
 
 # 3D
-fig=plt.figure(figsize=(8,8))
+fig=plt.figure(figsize=(9,9))
 ax3d = fig.add_subplot(111, projection='3d')
-ax3d.set_xlabel('x ($\mu$m)')
-ax3d.set_ylabel('y ($\mu$m)')
-ax3d.set_zlabel('z ($\mu$m)')
-ax3d.plot(x[:10000],y[:10000],z[:10000],'bo',ms=0.5)
+ax3d.set_xlabel('\n x ($\mu$m)', linespacing=3.2)
+ax3d.set_ylabel('\n y ($\mu$m)', linespacing=3.2)
+ax3d.set_zlabel('\n z ($\mu$m)', linespacing=3.2)
+ax3d.plot(x[:10000],y[:10000],z[:10000],'bo',ms=1) # first 200 steps (clarity)
 plt.tight_layout()
 plt.savefig('XYZ_3D_Cell.png',dpi=400)
 plt.close()
 
 # xy
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
-plt.plot(x,y,'bo',ms=0.5)
+#plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+#plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+#plt.xlim(-box,box)
+#plt.ylim(-box,box)
+plt.plot(x[:10000],y[:10000],'bo',ms=1, label="Runs")
+plt.plot(x[tumble_index], y[tumble_index],marker='o',ms=3,markeredgecolor='red',markerfacecolor='red',ls='None',lw=0, label="Tumbles")  # highlight tumbles
+plt.plot(x[0],y[0],'kx',ms=15)
+plt.plot(x[0],y[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('x ($\mu$m)')
 plt.ylabel('y ($\mu$m)')
-plt.tight_layout
+plt.legend()
+plt.tight_layout()
 plt.savefig("XY_Cell.png",dpi=400)
 plt.close()
 # yz
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
-plt.plot(y,z,'bo',ms=0.5)
+plt.plot(y[:10000],z[:10000],'bo',ms=1, label="Runs")
+plt.plot(y[tumble_index], z[tumble_index],marker='o',ms=3,markeredgecolor='red',markerfacecolor='red',ls='None',lw=0, label="Tumbles")
+plt.plot(y[0],z[0],'kx',ms=15)
+plt.plot(y[0],z[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('y ($\mu$m)')
 plt.ylabel('z ($\mu$m)')
-plt.tight_layout
+plt.legend()
+plt.tight_layout()
 plt.savefig("YZ_Cell.png",dpi=400)
 plt.close()
 
 # xz
 plt.figure(figsize=(8,8))
-plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
-plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
-plt.xlim(-box,box)
-plt.ylim(-box,box)
-plt.plot(x,z,'bo',ms=0.5)
+plt.plot(x[:10000],z[:10000],'bo',ms=1, label="Runs")
+plt.plot(x[tumble_index], z[tumble_index],marker='o',ms=3,markeredgecolor='red',markerfacecolor='red',ls='None',lw=0, label="Tumbles")
+plt.plot(x[0],z[0],'kx',ms=15)
+plt.plot(x[0],z[0],marker='o',markeredgecolor='k',markerfacecolor='None',ms=15)
 plt.xlabel('x ($\mu$m)')
 plt.ylabel('z ($\mu$m)')
-plt.tight_layout
+plt.legend()
+plt.tight_layout()
 plt.savefig("XZ_Cell.png",dpi=400)
 plt.close()
 
 # Angular correlation (Brownian)
 ac_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/AngCorr_TBM-RBM_1000s.txt")
 
+plt.figure(figsize=(8,6))
+t=ac_brown[:,0]
+acf=ac_brown[:,1]
+fit=np.exp(-np.divide(t,tc))
+plt.plot(t,acf,color='b',ms=1,marker='o',lw=0,ls='None',label="Brownian data")
+plt.plot(t,fit,color='k',ls='--',lw=2, label="$C(\\tau)=\exp(-2D_r\\tau)$")
+plt.plot([tc,tc],[-0.2,1.0],color='r',ls=':',lw=2,label="$\\tau_c=(2D_r)^{-1}$="+"{:4.2f} s".format(tc))
+plt.ylim(-0.25,1.0)
+plt.xlim(1e-2,1e3)
+plt.xscale('log')
+plt.xlabel('Delay time (s)')
+plt.ylabel('Angular correlation function')
+plt.legend()
+plt.tight_layout()
+plt.savefig("ACF.png",dpi=400)
+plt.close()
 
 # Early-time MSD and MSAD (Brownian)
 msd_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/ModelMeanSquare_r_test-TBM-RBM_1000s.txt")
 msad_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/ModelMeanSquare_theta_test-TBM-RBM_1000s.txt")
+
+plt.figure(figsize=(7,7))
+t=msd_brown[:,0]
+msd=msd_brown[:,1]
+fit=6*Dkt*t
+plt.plot(t,msd,color='b',ms=2,marker='o',lw=0,ls='None',label="Brownian data")
+plt.plot(t,fit,color='k',ls='--',lw=2, label="$\langle r^2 \\rangle=6D\\tau$")
+plt.plot([tc,tc],[1e-3,1e2],color='r',ls=':',lw=2,label="$\\tau_c=(2D_r)^{-1}$="+"{:4.2f} s".format(tc))
+plt.ylim(0,16)
+plt.xlim(0,10)
+#plt.xscale('log')
+plt.xlabel('Delay time (s)')
+plt.ylabel("Mean-square displacement $(\mu m^2)$")
+plt.legend(loc=4)
+plt.tight_layout()
+plt.savefig("MSD_EarlyTime.png",dpi=400)
+plt.close()
+
+plt.figure(figsize=(7,7))
+t=msad_brown[:,0]
+msad=msad_brown[:,1]
+fit=4*Dr*t
+plt.plot(t,msad,color='b',ms=2,marker='o',lw=0,ls='None',label="Brownian data")
+plt.plot(t,fit,color='k',ls='--',lw=2, label="$\langle \\theta^2 \\rangle=4D_r\\tau$")
+plt.plot([tc,tc],[1e-3,1e2],color='r',ls=':',lw=2,label="$\\tau_c=(2D_r)^{-1}$="+"{:4.2f} s".format(tc))
+plt.ylim(0,8.0)
+plt.xlim(0,10)
+#plt.xscale('log')
+plt.xlabel('Delay time (s)')
+plt.ylabel("Mean-square angular displacement $(rad^2)$")
+plt.legend(loc=4)
+plt.tight_layout()
+plt.savefig("MSAD_EarlyTime.png",dpi=400)
+plt.close()
