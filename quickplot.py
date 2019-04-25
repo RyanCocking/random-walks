@@ -2,6 +2,7 @@
 
 import re
 import glob
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import figures as fg
@@ -58,7 +59,7 @@ def separate_files(name, rbm_list, norbm_list):
             norbm_list[3] = name
 
 plot_msd=False
-plot_msad=True
+plot_msad=False
 
 # Shorthand parameters
 Dkt = System.diffusion_constant 
@@ -66,13 +67,20 @@ Dswim = System.swim_diffusion_constant
 Dr = System.rot_diffusion_constant
 lt = System.tumble_prob
 v = System.mean_speed
+tc = 1.0/(2.0*Dr)  # correlation time
+
+# Fonts
+matplotlib.rcParams.update({'font.size': 13})
+matplotlib.rc('xtick', labelsize=16) 
+matplotlib.rc('ytick', labelsize=16)
+matplotlib.rc('axes', labelsize=16)
 
 folder = "results/lt={:s}/".format(str(lt))
 
 # Colours
 expt_color='#ff6a00'  # orange
-colors=['#de3fff','#ffee00','#ea0000','#2eff00']  # [m,y,r,g]
-bm_color='#3f88ff'  # blue
+colors=['#ac2fc6','#e0d100','#ea0000','#23c600']  # [m,y,r,g]
+bm_color='#306ac9'  # blue
 
 # Units
 units_mu="$\mu m^2 s^{-1}$"
@@ -92,7 +100,7 @@ if plot_msd:
     msd_files  = glob.glob(folder+"*/ModelMeanSquare_r*")
     #msad_files = glob.glob(folder+"*/ModelMeanSquare_theta*")
 
-    title = "$D_{TBM}=$"+"{:5.4f} ".format(Dkt)+units_mu+", $D_{swim}=$"+"{:5.4f} ".format(Dswim)+units_mu+", $D_r=$"+"{:5.4f} ".format(Dr)+units_rad+", $\lambda_T=$"+"{:5.4f}".format(lt)
+    title = "$D=$"+"{:5.4f} ".format(Dkt)+units_mu+", $D_{swim}=$"+"{:5.4f} ".format(Dswim)+units_mu+", $D_r=$"+"{:5.4f} ".format(Dr)+units_rad+", $\lambda_T=$"+"{:5.4f}".format(lt)
     title = ""
 
     # darker
@@ -100,11 +108,11 @@ if plot_msd:
     #bm_color='#004b8e'  # blue
     
 
-    run_fit_label="$\langle r_{run}^2 \\rangle = \langle v \\rangle^2 \\tau^2$"
-    bm_fit_label="$\langle r_{brown}^2 \\rangle = 6D_{TBM}\\tau$"
-    swim_fit_label="$\langle r_{swim}^2 \\rangle = 6D_{swim}\\tau$"
+    run_fit_label="$\langle r^2 \\rangle = \langle v \\rangle^2 \\tau^2$"
+    bm_fit_label="$\langle r^2 \\rangle = 6D\\tau$"
+    swim_fit_label="$\langle r^2 \\rangle = 6D_{swim}\\tau$"
 
-    plt.figure(figsize=(6,8))
+    plt.figure(figsize=(7,9))
     plt.title(title)
 
     # Plot MSD mean-square displacements THAT CONTAIN RBM
@@ -129,15 +137,18 @@ if plot_msd:
     plt.plot(t, r2_run_fit, label=run_fit_label, lw=2, ls='--',color='k')
     plt.plot(t, r2_bm_fit, label=bm_fit_label, lw=2, ls=':',color='k')
     plt.plot(t, r2_swim_fit, label=swim_fit_label, lw=2, ls='-.',color='k')
+    plt.plot([tc,tc], [1e-2,1e7], label="$\\tau_c=(2D_r)^{-1}=$"+"{:4.2f} s".format(tc), lw=2, ls=':', color='r')
 
-    msq_options("$\\tau$ (s)","$\langle r^2 \\rangle (\mu m^2)$")
+    msq_options("Delay time (s)","Mean-square displacement $(\mu m^2)$")
     #plt.show()
+    plt.legend()
+    plt.tight_layout()
     plt.savefig('MeanSquarePlot_r_RBM.png',dpi=400)
     plt.close()
 
     # ====================
 
-    plt.figure(figsize=(6,8))
+    plt.figure(figsize=(7,9))
     plt.title(title)
 
     # Plot MSD mean-square displacements THAT DO NOT CONTAIN RBM
@@ -154,14 +165,17 @@ if plot_msd:
 
     
     
-    plt.plot(t_expt, r2_expt, label="Experiment_34s", lw=3, ls='--', color=expt_color)
+    plt.plot(t_expt, r2_expt, label="Experiment_24s", lw=3, ls='--', color=expt_color)
 
     plt.plot(t, r2_run_fit, label=run_fit_label, lw=2, ls='--',color='k')
     plt.plot(t, r2_bm_fit, label=bm_fit_label, lw=2, ls=':',color='k')
     plt.plot(t, r2_swim_fit, label=swim_fit_label, lw=2, ls='-.',color='k')
+    plt.plot([tc,tc], [1e-2,1e7], label="$\\tau_c=(2D_r)^{-1}=$"+"{:4.2f} s".format(tc), lw=2, ls=':', color='r')
 
-    msq_options("$\\tau$ (s)","$\langle r^2 \\rangle (\mu m^2)$")
+    msq_options("Delay time (s)","Mean-square displacement $(\mu m^2)$")
     #plt.show()
+    plt.legend()
+    plt.tight_layout()
     plt.savefig('MeanSquarePlot_r.png')
     plt.close()
 
@@ -173,7 +187,7 @@ if plot_msd:
 
     labels = ["Run","RunTum","RunTumTBM","RunTBM"]
 
-    plt.figure(figsize=(6,6))
+    plt.figure(figsize=(7,7))
     plt.title(title)
 
     for i in range(0,4):
@@ -186,11 +200,14 @@ if plot_msd:
         ratio = np.divide(r1,r2) # rbm:no rbm
         plt.plot(t,ratio,label=labels[i],color=mycolor,lw=3,ls='-')
         
-    msq_options("$\\tau$ (s)", "$Q_{MSD}$", xmin=1e-2, xmax=1e3, ymin=1e-3, ymax=1e0, xs="log", ys="log")
-    plt.legend()
+    plt.plot([tc,tc], [1e-4,1e0], label="$\\tau_c=(2D_r)^{-1}=$"+"{:4.2f} s".format(tc), lw=2, ls=':', color='r')
+        
+    msq_options("Delay time (s)", "$Q_{MSD}$", xmin=1e-2, xmax=1e3, ymin=1e-3, ymax=1e0, xs="log", ys="log")
+    plt.legend(bbox_to_anchor=(0.5,0.95))
+    plt.tight_layout()
     plt.savefig("MeanSquarePlot_Ratio_r.png",dpi=400)
     
-elif plot_msad:
+if plot_msad:
     
     folder+="lt={:s}_".format(str(lt))
 
@@ -215,8 +232,8 @@ elif plot_msad:
     plt.plot(tau, MSAD_run_tum_tbm[:,1],label="RunTumTBM",ls='-', lw=2, color=colors[1])
     plt.plot(tau, MSAD_run_tum_tbm_rbm[:,1],label="RunTumTBMRBM",ls='-', lw=2,color=colors[2])
     
-    plt.xlabel("$\\tau$ (s)")
-    plt.ylabel("$\langle \\theta^2 \\rangle$ $(rad^2)$")
+    plt.xlabel("Delay time (s)")
+    plt.ylabel("Mean-square angular displacement $(rad^2)$")
     
     plt.xscale('log')
     plt.yscale('log')
@@ -228,7 +245,7 @@ elif plot_msad:
     plt.savefig("MeanSquareThetaPlot.png",dpi=400)
     plt.close()
     
-    plt.figure(figsize=(6,6))
+    plt.figure(figsize=(7,7))
     ratio = MSAD_run_tum_tbm_rbm[:,1] / MSAD_run_tum_tbm[:,1]
     plt.plot(tau, ratio, color='k', lw=3, ls='-')
     plt.plot([1e-2,1e3],[1,1],color='k',lw=1,ls='--')
@@ -241,3 +258,133 @@ elif plot_msad:
     
     plt.savefig("ThetaRatio.png",dpi=400)
     plt.close()
+
+# Trajectories (Brownian and realistic cell)
+xyz_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/ModelTraj_TBM-RBM_1000s.txt")
+t=xyz_brown[:,0]
+x=xyz_brown[:,1]
+y=xyz_brown[:,2]
+z=xyz_brown[:,3]
+
+box=35
+
+# Brownian
+# 3D
+fig=plt.figure(figsize=(8,8))
+ax3d = fig.add_subplot(111, projection='3d')
+ax3d.set_xlabel('x ($\mu$m)')
+ax3d.set_ylabel('y ($\mu$m)')
+ax3d.set_zlabel('z ($\mu$m)')
+ax3d.plot(x,y,z,'bo',ms=0.5)
+plt.tight_layout()
+plt.savefig('XYZ_3D_Brownian.png',dpi=400)
+plt.close()
+# xy
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(x,y,'bo',ms=0.5)
+plt.xlabel('x ($\mu$m)')
+plt.ylabel('y ($\mu$m)')
+plt.tight_layout
+plt.savefig("XY_Brownian.png",dpi=400)
+plt.close()
+# yz
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(y,z,'bo',ms=0.5)
+plt.xlabel('y ($\mu$m)')
+plt.ylabel('z ($\mu$m)')
+plt.tight_layout
+plt.savefig("YZ_Brownian.png",dpi=400)
+plt.close()
+
+# xz
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(x,z,'bo',ms=0.5)
+plt.xlabel('x ($\mu$m)')
+plt.ylabel('z ($\mu$m)')
+plt.tight_layout
+plt.savefig("XZ_Brownian.png",dpi=400)
+plt.close()
+
+# Cell
+xyz_cell=np.loadtxt("results/lt=0.02/lt=0.02_All/ModelTraj_test-Run-Tumble-TBM-RBM_1000s.txt")
+t=xyz_cell[:,0]
+x=xyz_cell[:,1]
+y=xyz_cell[:,2]
+z=xyz_cell[:,3]
+
+box=800
+boxxmax=700
+boxxmin=-200
+boxymax=200
+boxymin=-900
+boxzmax=300
+boxzmin=-400
+
+# 3D
+fig=plt.figure(figsize=(8,8))
+ax3d = fig.add_subplot(111, projection='3d')
+ax3d.set_xlabel('x ($\mu$m)')
+ax3d.set_ylabel('y ($\mu$m)')
+ax3d.set_zlabel('z ($\mu$m)')
+ax3d.plot(x[:10000],y[:10000],z[:10000],'bo',ms=0.5)
+plt.tight_layout()
+plt.savefig('XYZ_3D_Cell.png',dpi=400)
+plt.close()
+
+# xy
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(x,y,'bo',ms=0.5)
+plt.xlabel('x ($\mu$m)')
+plt.ylabel('y ($\mu$m)')
+plt.tight_layout
+plt.savefig("XY_Cell.png",dpi=400)
+plt.close()
+# yz
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(y,z,'bo',ms=0.5)
+plt.xlabel('y ($\mu$m)')
+plt.ylabel('z ($\mu$m)')
+plt.tight_layout
+plt.savefig("YZ_Cell.png",dpi=400)
+plt.close()
+
+# xz
+plt.figure(figsize=(8,8))
+plt.plot([0,0],[-box,box],ls=':',color='k',lw=1)
+plt.plot([-box,box],[0,0],ls=':',color='k',lw=1)
+plt.xlim(-box,box)
+plt.ylim(-box,box)
+plt.plot(x,z,'bo',ms=0.5)
+plt.xlabel('x ($\mu$m)')
+plt.ylabel('z ($\mu$m)')
+plt.tight_layout
+plt.savefig("XZ_Cell.png",dpi=400)
+plt.close()
+
+# Angular correlation (Brownian)
+ac_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/AngCorr_TBM-RBM_1000s.txt")
+
+
+# Early-time MSD and MSAD (Brownian)
+msd_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/ModelMeanSquare_r_test-TBM-RBM_1000s.txt")
+msad_brown=np.loadtxt("results/lt=0.02/lt=0.02_TBMRBM/ModelMeanSquare_theta_test-TBM-RBM_1000s.txt")
