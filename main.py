@@ -19,6 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
+# NOTE: WIP CODE - Lots of extraneous data and figures for dissertation purposes 
+
 # external libraries
 import matplotlib.pyplot as plt
 import scipy.stats as ss
@@ -30,6 +32,9 @@ from data import Data
 from params import System
 from my_io import IO
 import figures as fg
+
+# NOTE: temp
+import matplotlib
 
 #----------------------------------------------------------------------------#
 #----------------------------------SIMULATION--------------------------------#
@@ -57,60 +62,108 @@ for time in System.timesteps[1:]:
                        System.time_step, System.cell_run, System.cell_tumble,
                        System.cell_tbm, System.cell_rbm)
 
+print("Number of tumbles = ",len(swimmer.run_durations))
 print('Done')
 
+matplotlib.rcParams.update({'font.size': 14})
+matplotlib.rc('xtick', labelsize=15) 
+matplotlib.rc('ytick', labelsize=15)
+matplotlib.rc('axes', labelsize=15)
+
 if System.cell_run and System.cell_tumble:
+    
+    plt.figure(figsize=(6,6))
+    # Run duration distribution
+    # FULL LINEAR PLOT
     mu = np.mean(swimmer.run_durations)
     sigma = np.std(swimmer.run_durations)
     num_runs = len(swimmer.run_durations)
-    plt.title(System.title+", $\lambda_T={0:5.3f}$, runs={1}".format(System.tumble_prob,num_runs))
-    plt.hist(swimmer.run_durations, bins='auto', density=True, edgecolor='black',
-        label="Model: $\mu={0:6.3f}$, $\sigma={1:6.3f}$".format(mu,sigma))
+    #plt.title(System.title+", $\lambda_T={0:5.3f}$, runs={1}".format(System.tumble_prob,num_runs))
+    mybins=np.arange(0,5,step=0.2)  # bin width = 'step' seconds
+    plt.hist(swimmer.run_durations, bins=mybins, density=True, edgecolor='black', facecolor='#1643ff',
+        label="Data: $\langle t \\rangle={0:6.2f}\pm{1:6.2f}$ s".format(mu,sigma))
     x=np.linspace(0,max(swimmer.run_durations),num=100)
     l = System.tumble_prob/System.time_step
     fit=l*np.exp(-l*x)
-    #plt.plot(x,fit,'r',lw=2,label="$\\frac{\lambda_T}{\Delta t} e^{-\lambda_T t/\Delta t }$"+
-             #" ; $\lambda_T={:5.3f}$, $\langle t \\rangle={:5.2f}$".format(System.tumble_prob, System.mean_run_dur))
-    plt.plot(x,fit,'r',lw=2,label="Fit: $\mu=\sigma={0:6.3f}$".format(System.mean_run_dur))
-    plt.yscale('log')
-    plt.ylim(0.001,1.1*l)
-    plt.xlim(0,max(x))
+    plt.plot(x,fit,'r',lw=2,label="$P(t)=\\frac{1}{\langle t \\rangle}e^{-t/\langle t \\rangle}=e^{-t}$")
+    
+    plt.yscale('linear')
+    plt.ylim(0,1)
+    plt.xlim(0,5)
     plt.ylabel('Probability density')
     plt.xlabel('Run duration (s)')
     #plt.grid(True)
+    plt.tight_layout()
     plt.legend()
-    plt.savefig("RunDurLog{0:s}.png".format(System.file_id),dpi=400)
-    plt.yscale('linear')
-    #plt.ylim(0,1.1*l)
     plt.savefig("RunDur{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
+    
+    # INSET LOG PLOT - Place manually onto other plot
+    plt.figure(figsize=(7,7))
+    matplotlib.rc('xtick', labelsize=35) 
+    matplotlib.rc('ytick', labelsize=35)
+    matplotlib.rc('axes', labelsize=35)
+    plt.hist(swimmer.run_durations, bins=mybins, density=True, edgecolor='black', lw=1.5, facecolor='#1643ff',
+    label="Data: $\langle t \\rangle={0:6.2f}\pm{1:6.2f}$ s".format(mu,sigma))
+    plt.plot(x,fit,'r',lw=4)
+    plt.yscale('log')
+    plt.ylim(1e-3,1)
+    plt.xlim(0,5)
+    #plt.yticks([1e-3, 1.5e-1, 1e0])
+    plt.xticks([0,2.5,5])
+    plt.tight_layout()
+    plt.savefig("RunDurLog{0:s}.png".format(System.file_id),dpi=200)
+    plt.close()
+
+matplotlib.rcParams.update({'font.size': 14})
+matplotlib.rc('xtick', labelsize=15) 
+matplotlib.rc('ytick', labelsize=15)
+matplotlib.rc('axes', labelsize=15)
 
 if System.cell_rbm or System.cell_tumble:
-    ang=np.rad2deg(Data.compute_angles(np.array(swimmer.combined_history))[0])
-    ang=ang[np.where(ang>0.001)]  # remove negligible angles
-    mu = np.mean(ang)
-    sigma = np.std(ang)
-    plt.hist(ang, bins=50, density=True, edgecolor='black', label="Model: $\mu={0:7.3f}$, $\sigma={1:7.3f}$".format(mu,sigma))
-    title_dr=System.title+", $D_r={:6.4f}rad^2$".format(System.rot_diffusion_constant)
-    title_dr+="$s^{-1}$"
-    plt.title(title_dr)
-    if System.cell_rbm and not System.cell_tumble:
-        # CURRENTLY WRONG because dotted angles are used instead of recorded angles
-        x=np.linspace(-20,20,num=100)
-        sigma_fit = np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step))
-        fit=2*ss.norm.pdf(x,0,sigma_fit)
-        plt.plot(x,fit,'r',lw=2,label="Fit: $\mu=0$, $\sigma=4D_r\Delta t={0:7.3f}$".format(sigma_fit))
-    if System.cell_tumble and not System.cell_rbm:
-        x=np.linspace(0,180,num=100)
+    plt.figure(figsize=(8,6))
+    # Angle distribution
+    if System.cell_tumble:
+        #Tumble angles 
+        ang=np.rad2deg(np.array(swimmer.tumble_angles))
+        print('Tumble: ',np.max(ang), np.min(ang))
+        mu = np.mean(ang)
+        sigma = np.std(ang)
+        mybins=np.arange(-50,200,step=2)  # bin width = 'step' degrees
+        plt.hist(ang, bins=mybins, density=True, histtype='bar', facecolor='None', edgecolor='#1643ff',
+            lw=1, label="$\langle \\theta_{{tum}} \\rangle={0:6.2f}\pm{1:6.2f}^\circ$".format(mu,sigma))
+        # Tumble fit
+        x=np.linspace(-50,200,num=500)
         mu_fit = 68
         sigma_fit = 36
         fit=ss.norm.pdf(x,mu_fit,sigma_fit)
-        plt.plot(x,fit,'r',lw=2,label="Fit: $\mu={0:7.3f}$, $\sigma={1:7.3f}$".format(mu_fit,sigma_fit))
+        plt.plot(x,fit,color='#001e99',ls='-',lw=2,label="$\langle \\theta_{{tum}} \\rangle=68\pm36^\circ$")
+    if System.cell_rbm:
+        # RBM angles
+        ang=np.rad2deg(np.array(swimmer.RBM_ANGLES))
+        print('RBM: ',np.max(ang), np.min(ang))
+        mu = np.mean(ang)
+        sigma = np.std(ang)
+        mybins=np.arange(-25,25,step=2)  # bin width = 'step' degrees
+        plt.hist(ang, bins=mybins, density=True, histtype='bar', facecolor='None', edgecolor='r', lw=1, label="$\langle \\theta_r \\rangle={0:6.2f}\pm{1:6.2f}^\circ$".format(mu,sigma))
+        # RBM fit
+        x=np.linspace(-50,50,num=500)
+        sigma_fit = np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step))
+        fit=ss.norm.pdf(x,0,sigma_fit)
+        plt.plot(x,fit,color='#a30000',ls='-',lw=2,label="$\langle \\theta_r \\rangle=0\pm\sqrt{{4D_r\Delta t}}$")
     if System.cell_tumble and System.cell_rbm:
-        plt.yscale('log')
+        # Tumble and RBM
+        #plt.yscale('log')
+        pass
+        
+    plt.ylim(0,0.065)
+    plt.xlim(-40,180)
+    #plt.yticks(np.arange(0,0.07,step=0.01))
+    plt.xticks(np.arange(-40, 181, step=20))
     plt.ylabel('Probability density')
-    plt.xlabel('Angular deviation between adjacent timesteps (deg)')
+    plt.xlabel('Angular displacement (deg)')
     plt.legend()
+    plt.tight_layout()
     plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
