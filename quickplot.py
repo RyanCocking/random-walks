@@ -59,7 +59,7 @@ def separate_files(name, rbm_list, norbm_list):
             norbm_list[3] = name
 
 plot_msd=False
-plot_msad=False
+plot_msad=True
 
 # Shorthand parameters
 Dkt = System.diffusion_constant 
@@ -383,10 +383,11 @@ plt.figure(figsize=(8,6))
 t=ac_brown[:,0]
 acf=ac_brown[:,1]
 fit=np.exp(-np.divide(t,tc))
+plt.plot([1e-2,1e3],[0,0],'k:',lw=1)
 plt.plot(t,acf,color='b',ms=1,marker='o',lw=0,ls='None',label="Brownian data")
 plt.plot(t,fit,color='k',ls='--',lw=2, label="$C(\\tau)=\exp(-2D_r\\tau)$")
 plt.plot([tc,tc],[-0.2,1.0],color='r',ls=':',lw=2,label="$\\tau_c=(2D_r)^{-1}$="+"{:4.2f} s".format(tc))
-plt.ylim(-0.25,1.0)
+plt.ylim(-0.2,1.0)
 plt.xlim(1e-2,1e3)
 plt.xscale('log')
 plt.xlabel('Delay time (s)')
