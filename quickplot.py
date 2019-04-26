@@ -1,5 +1,6 @@
 # For plotting things outside of main file
 
+import scipy.stats as ss
 import re
 import glob
 import matplotlib
@@ -434,3 +435,38 @@ plt.legend(loc=4)
 plt.tight_layout()
 plt.savefig("MSAD_EarlyTime.png",dpi=400)
 plt.close()
+
+
+
+# THEORY PLOT
+
+plt.figure(figsize=(7,7))
+x=np.linspace(-20,20,num=500)
+D=1
+sigma_fitx = np.sqrt(2*D*1)
+sigma_fity = np.sqrt(2*D*4)
+sigma_fitz = np.sqrt(2*D*16)
+plt.plot(x,ss.norm.pdf(x,0,sigma_fitx), 'b-', label="$P(x,1)$, $\langle x \\rangle={:5.3f}$".format(sigma_fitx))
+plt.plot(x,ss.norm.pdf(x,0,sigma_fity), 'r-', label="$P(x,4)$, $\langle x \\rangle={:5.3f}$".format(sigma_fity))
+plt.plot(x,ss.norm.pdf(x,0,sigma_fitz), 'g-', label="$P(x,16)$, $\langle x \\rangle={:5.3f}$".format(sigma_fitz))
+plt.ylim(0,0.3)
+plt.xlim(-20,20)
+plt.ylabel("Probability density")
+plt.xlabel("Displacement (step lengths)")
+plt.legend()
+plt.tight_layout()
+plt.savefig("Theory_Normals.png",dpi=400)
+plt.close()
+
+
+# Cubic graph
+plt.figure(figsize=(7,7))
+t=np.arange(0,10,step=1)
+x=np.linspace(0,3.6,num=len(t))
+plt.xlim(-0.1,10.1)
+plt.ylim(-0.1,14)
+plt.xlabel("Delay time (s)")
+plt.ylabel("Displacement (step lengths)")
+plt.plot(t,x**2,'bo',ms=6)
+plt.tight_layout()
+plt.savefig("Cubic.png",dpi=400)
