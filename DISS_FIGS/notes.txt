@@ -1,5 +1,0 @@
-992 tumbles
-Trajectory plot only visualised for first 200 seconds (1e4 steps) - 197 tumbles in this time
-Angle distributions have bars that are 2deg wide
-Run distribution has bars that are 0.2s wide
-
