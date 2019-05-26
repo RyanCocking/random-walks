@@ -59,7 +59,7 @@ class System:
     cell_rbm = True
     
     # Data analysis flags
-    run_expt = True
+    run_expt = False
     run_ang_corr = True
     run_delay_time = True
 
