@@ -1,2 +1,0 @@
-Pure Brownian particle, only with TBM and RBM. Angular Correlation was messed up, so need to redo that bit.
-
