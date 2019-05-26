@@ -238,7 +238,7 @@ print("Done")
 if System.run_expt:
     # EXPERIMENT DATA
     print('Loading experimental trajectory from file...')
-    tt, pos_track, pos_s_track = IO.load_expt('tracks/track34sm.txt')
+    tt, pos_track, pos_s_track = IO.load_expt(System.expt_file)
     xt = pos_track[:,0]
     yt = pos_track[:,1]
     zt = pos_track[:,2]
@@ -376,4 +376,6 @@ if System.run_delay_time:
                 ["$\\tau$ (s)","$\langle r^2_{\\tau} \\rangle$ $(\mu m^2)$"],
                 'tau_VS_msq_r_crop', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
                 fitlabel="6Dt", limx=[0,10])  # r
+
+    print("Done")
 
