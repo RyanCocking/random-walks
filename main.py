@@ -65,6 +65,9 @@ for time in System.timesteps[1:]:
 print("Number of tumbles = ",len(swimmer.run_durations))
 print('Done')
 
+# ====================================
+# NOTE - Temporary graph plotting code
+
 matplotlib.rcParams.update({'font.size': 14})
 matplotlib.rc('xtick', labelsize=15) 
 matplotlib.rc('ytick', labelsize=15)
@@ -167,6 +170,8 @@ if System.cell_rbm or System.cell_tumble:
     plt.savefig("AngDist{0:s}.png".format(System.file_id),dpi=400)
     plt.close()
 
+# ====================================
+    
 #----------------------------------------------------------------------------#
 #---------------------------------TRAJECTORIES-------------------------------#
 #----------------------------------------------------------------------------#
@@ -282,6 +287,7 @@ if System.run_ang_corr:
     tc = 1.0/(2.0 * System.rot_diffusion_constant)
     cc = 0.333
 
+    # NOTE - Temporary angular correlation plot
     plt.plot([tc,tc],[1.0,-0.5],color='k',ls='--',lw=0.5,label="$\\tau = 1/2D_r$")
     plt.plot([0,np.max(tau)],[cc,cc],color='k',ls='--',lw=0.5)
     plt.plot(tau,cfit,color='r',label="exp($-2D_r\\tau$)")
@@ -333,7 +339,7 @@ if System.run_delay_time:
         IO.save_model(filename,[tau_t,msq_rt],["%.2f","%.6e"])
         print('Done')
 
-    # DELAY TIME VS. MEAN SQUARE SCATTER PLOTS
+    # NOTE - Graph plotting
     print('Plotting graphs...')
     title_d=System.title+", $D={:6.4f}\mu m^2$".format(System.diffusion_constant)
     title_d+="$s^{-1}$"
@@ -371,21 +377,3 @@ if System.run_delay_time:
                 'tau_VS_msq_r_crop', "Experiment", tag='expt_', fit=False, fitdata=[tau,fit_r],
                 fitlabel="6Dt", limx=[0,10])  # r
 
-    # PROBABILITY DISTRIBUTIONS
-    # brownian
-    #fg.distribution(xb_tau[0],'$x(\\tau=1)$ $(\mu m)$','x_VS_p_tau1',title_d,tag='bm_')  # x
-    #fg.distribution(yb_tau[0],'$y(\\tau=1)$ $(\mu m)$','y_VS_p_tau1',title_d,tag='bm_')  # y
-    #fg.distribution(zb_tau[0],'$z(\\tau=1)$ $(\mu m)$','z_VS_p_tau1',title_d,tag='bm_')  # z
-
-    #fit_r=np.linspace(min(rb_tau[0]),max(rb_tau[0]),num=50)
-    #fit_p=ss.norm.pdf(fit_r,0,np.sqrt(6*System.diffusion_constant*System.time_step))
-    #fg.distribution(rb_tau[0],'$r(\\tau=1)$ $(\mu m)$','r_VS_p_tau1',title_d,tag='bm_',fit=True,fitdata=[fit_r,fit_p],
-        #fitlabel=r"$P(r,t)=\frac{1}{\sqrt{12\pi D\Delta t}}\exp\left[{\frac{-r^2}{12D\Delta t}}\right]$")  # r
-
-    #fit_th=np.linspace(-15,15,num=1000)
-    #fit_p=ss.norm.pdf(fit_th,0,np.rad2deg(np.sqrt(4*System.rot_diffusion_constant*System.time_step)))
-    #fg.distribution(np.rad2deg(thetab_tau[0]),'$\\Theta(\\tau=1)$ $(deg)$','Theta_VS_p_tau1',title_dr, 
-        #tag='bm_',fit=True, fitdata=[fit_th,fit_p],
-        #fitlabel=r"$P(\Theta_{rbm},t)=\frac{1}{\sqrt{8\pi D_r\Delta t}}\exp\left[{\frac{-\Theta_{rbm}^2}{8D_r\Delta t}}\right]$")  # theta
-
-    print('Done')
