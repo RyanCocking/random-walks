@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
 
+# Cartesian rotation matrices
 def Rx(angle):
     sin = np.sin(angle)
     cos = np.cos(angle)
@@ -49,7 +50,8 @@ def rotate(rhat,theta,phi):
     """
     Transform a unit vector, rhat, to align with the z-axis. Perform rotations
     by theta radians about the y-axis and phi radians about the z-axis (in that 
-    order). Inverse-transform the vector back to its original position. 
+    order). Inverse-transform the vector back to its original position.
+    
     Spherical polar coordinates are used here (rhat, theta, phi), with 
     anticlockwise rotations.
     
@@ -80,6 +82,10 @@ class Cell3D:
 
     def __init__(self, name, position, speed, direction, tumble_chance,
                  time_step):
+        """
+        Initial cell values
+        """
+        
         self.name = name
         self.swim_position = position
         self.brownian_position = np.copy(position)
@@ -106,10 +112,15 @@ class Cell3D:
 
 
     def run(self, time_step):
-        """Move forwards in current direction."""
+        """
+        Move forwards in current direction and increment the duration
+        of the run.
+        """
+        
         self.velocity = self.speed * self.direction
         self.swim_position += (self.velocity * time_step)
         self.run_duration += time_step
+        
 
     def tumble(self, tumble_mean, tumble_stddev):
         """
@@ -132,7 +143,6 @@ class Cell3D:
         
         return theta_t
 
-
     def draw_brownian_step(dim, D, dt):
         """
         Return a value drawn from a normal distribution centred at zero,
@@ -144,12 +154,10 @@ class Cell3D:
 
         return np.random.normal(loc=0, scale=np.sqrt(dim*2.0*D*dt), size=None)
 
-
     def trans_brownian_motion(self, diffusion_constant, time_step):
         """
-        Thermal fluctuations in the x, y and z axes. Uses the Berg
-        approach of having a 50% chance to move +/- a step in each
-        axis. Add the Brownian steps to their own position history.
+        Thermal fluctuations in the x, y and z axes. Cell has a 50% 
+        chance to move +/- a step in each axis.
         """
 
         # independent steps in x, y and z
@@ -184,25 +192,12 @@ class Cell3D:
                enable_run=True, enable_tumble=True, enable_tbm=True,
                enable_rbm=True):
         """
-        
-        PLEASE UPDATE THIS COMMENT
-        
         Called once per time step:
-             1) Record the original direction in which the cell is facing.
-             2) Perform a run in this direction and increment the run duration.
-             3) Undergo translational Brownian motion (TBM).
-             4) Undergo rotational Brownian motion (RBM).
-             5) Compute rbm_angle with respect to the cell's original direction.
-             6) Draw a uniformly-distributed random number and tumble IF this is
-                smaller than the tumble probability per time step, tumble_chance.
-                6.1) Compute new angle with respect to old direction. This is the
-                     resultant angle from both RBM and tumbling.
-                6.2) Append this angle to a list of tumble angles. The final length
-                     of this list will be equal to the number of tumbles that
-                     occurred during the simulation.
-                6.3) Append the run duration to a list and reset the duration to
-                     zero ('end' the current run).
-             7) Append data to lists and exit.
+             1) Run forwards in the current direction
+             2) Move via translational Brownian motion
+             3) Rotate via rotational Brownian motion
+             4) If dice roll is successful, rotate via tumbling
+             5) Record cell state
         """
         
         if enable_run:
