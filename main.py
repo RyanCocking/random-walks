@@ -25,6 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 import matplotlib.pyplot as plt
 import scipy.stats as ss
 import numpy as np
+import os
 
 # custom classes
 from cell_3d import Cell3D
@@ -35,6 +36,9 @@ import figures as fg
 
 # NOTE: temp
 import matplotlib
+
+# Create folder for graphs
+os.mkdir("plots")
 
 #----------------------------------------------------------------------------#
 #----------------------------------SIMULATION--------------------------------#

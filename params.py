@@ -59,9 +59,12 @@ class System:
     cell_rbm = True
     
     # Data analysis flags
-    run_expt = False
+    run_expt = True
     run_ang_corr = True
     run_delay_time = True
+
+    # File path of experimental data (relative to main.py)
+    expt_file = "track34sm.txt"
 
     # Graph header
     title = "tmax={}s, t={}s, seed={}".format(max_time, time_step, seed)
