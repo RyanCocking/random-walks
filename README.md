@@ -5,4 +5,4 @@ Begun as part of an MPhys project supervised by Dr Laurence G Wilson at the Univ
 
 Source code uses the GNU General Public Licence (GPL).
 
-Dependencies: Linux OS, numpy, scipy, matplotlib
+Requirements: Linux OS, numpy, scipy, matplotlib
