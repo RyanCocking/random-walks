@@ -27,7 +27,7 @@ class IO:
     def load_expt(filename):
         """
         Load experimental cell tracking data from a text file. Return
-        time (s), positions (mu_m) and smoothed positions (mu_m).
+        time (sec), positions (mu) and smoothed positions (mu).
         """
 
         t, x, y, z, xs, ys, zs = np.loadtxt(filename,unpack=True,
