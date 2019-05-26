@@ -28,7 +28,7 @@ class System:
     boltz=1.38064852e-23  # J/k
    
     # Time (s)
-    max_time = 1000.0
+    max_time = 200.0
     time_step = 0.02
     total_steps = int(max_time / time_step)
     timesteps = np.linspace(0, max_time, num=total_steps+1, endpoint=True)
@@ -54,13 +54,13 @@ class System:
 
     # Simulation flags
     cell_run = True
-    cell_tumble = False
-    cell_tbm = False
-    cell_rbm = False
+    cell_tumble = True
+    cell_tbm = True
+    cell_rbm = True
     
     # Data analysis flags
-    run_expt = False
-    run_ang_corr = False
+    run_expt = True
+    run_ang_corr = True
     run_delay_time = True
 
     # Graph header
